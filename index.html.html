@@ -749,7 +749,11 @@ function fromFS(doc) {
     else if('booleanValue' in v) obj[k]=v.booleanValue;
     else if('doubleValue' in v) obj[k]=v.doubleValue;
     else if('integerValue' in v) obj[k]=Number(v.integerValue);
-    else if('stringValue' in v) { try{obj[k]=JSON.parse(v.stringValue);}catch(e){obj[k]=v.stringValue;} }
+    else if('stringValue' in v) {
+      // Don't auto-parse 'data' field - return raw string
+      if(k==='data') obj[k]=v.stringValue;
+      else { try{obj[k]=JSON.parse(v.stringValue);}catch(e){obj[k]=v.stringValue;} }
+    }
     else obj[k]=null;
   }
   return obj;
