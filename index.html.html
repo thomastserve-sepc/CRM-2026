@@ -796,7 +796,7 @@ function startPolling() {
           const fbUpdated = metaData.updated || '';
           if(fbUpdated !== lastUpdated) {
             try {
-              const fresh = JSON.parse(metaData.data);
+              const fresh = Array.isArray(metaData.data) ? metaData.data : JSON.parse(metaData.data);
               if(fresh && fresh.length > 0) {
                 lastUpdated = fbUpdated;
                 clients = fresh.map(c=>({...c,
