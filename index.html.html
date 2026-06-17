@@ -1015,14 +1015,22 @@ async function repairCA(){
   setSyncUI('syncing','Réparation CA 2026...');
   try {
     const fsH=await fsGet('historique');
-    const caMap={};
+    // Map by BOTH clientId AND salon name (IDs may have changed after reimport)
+    const caMapById={};
+    const caMapBySalon={};
     fsH.forEach(h=>{
-      if(h.clientId&&h.commande&&Number(h.commande)>0)
-        caMap[h.clientId]=(caMap[h.clientId]||0)+Number(h.commande);
+      if(h.commande&&Number(h.commande)>0){
+        if(h.clientId) caMapById[h.clientId]=(caMapById[h.clientId]||0)+Number(h.commande);
+        if(h.salon) caMapBySalon[h.salon]=(caMapBySalon[h.salon]||0)+Number(h.commande);
+      }
     });
     let updated=0;
     clients.forEach(c=>{
-      if(caMap[c.id]){c.ca26=caMap[c.id];updated++;}
+      // Try by ID first, then by salon name
+      const byId=caMapById[c.id]||0;
+      const bySalon=caMapBySalon[c.salon||c.nom]||0;
+      const newCA=Math.max(byId,bySalon);
+      if(newCA>0&&newCA!==c.ca26){c.ca26=newCA;updated++;}
     });
     if(updated>0){
       const ts=new Date().toISOString();
