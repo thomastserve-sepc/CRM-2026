@@ -1044,6 +1044,17 @@ async function repairCA(){
         }})
       });
       if(res.ok){
+        // Verify by reading back
+        const verify = await fetch(`${FB_URL}/meta/all_clients`,{headers:{'Content-Type':'application/json'}});
+        if(verify.ok){
+          const vDoc = await verify.json();
+          const vData = fromFS(vDoc);
+          if(vData && vData.data){
+            const parsed = JSON.parse(vData.data);
+            const total = parsed.reduce((s,c)=>s+Number(c.ca26||0),0);
+            console.log('Verified Firebase CA26 total after repair:', total);
+          }
+        }
         lastUpdated=ts;
         localStorage.setItem('crm_clients',JSON.stringify(clients));
         rDash();rC();rCA();
