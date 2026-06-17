@@ -1,0 +1,2391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CRM 2026">
+<title>CRM 2026 — Salons</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.8.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#0f2240;--navy2:#1a3a6b;--navy3:#2e5ea8;--navy4:#d0e4f8;--navy5:#edf5fd;
+  --sage:#1a5c2a;--sage2:#2d8b3a;--sage3:#c6e8cc;--sage4:#eaf7ec;
+  --amber:#7a4a00;--amber2:#c47a00;--amber3:#fde8a0;--amber4:#fef8dc;
+  --crimson:#8b1a1a;--crimson2:#c0392b;--crimson3:#f5c0bb;--crimson4:#fdf0ee;
+  --violet:#3b1a8b;--violet2:#6c4de0;--violet3:#e8e0f8;
+  --slate:#374151;--slate2:#6b7280;--slate3:#d1d5db;--slate4:#f9fafb;
+  --white:#ffffff;--ink:#111827;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 6px rgba(0,0,0,.07);--shadow-lg:0 10px 25px rgba(0,0,0,.1);
+  --safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);
+}
+html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:#f1f5f9;color:var(--ink);font-size:14px;-webkit-font-smoothing:antialiased}
+.app{display:flex;flex-direction:column;height:100%}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;gap:24px}
+.login-box{background:white;border-radius:16px;padding:32px;width:90%;max-width:360px;box-shadow:var(--shadow-lg)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo i{font-size:48px;color:var(--navy2)}
+.login-title{font-size:22px;font-weight:700;text-align:center;margin-bottom:4px;color:var(--navy)}
+.login-sub{font-size:13px;color:var(--slate2);text-align:center;margin-bottom:24px}
+.login-input{width:100%;padding:12px 16px;border:2px solid var(--slate3);border-radius:var(--r-sm);font-size:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s;margin-bottom:12px}
+.login-input:focus{border-color:var(--navy3)}
+.login-btn{width:100%;padding:13px;background:var(--navy2);color:white;border:none;border-radius:var(--r-sm);font-size:15px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s}
+.login-btn:active{background:var(--navy)}
+.login-error{color:var(--crimson2);font-size:12px;text-align:center;margin-top:8px;display:none}
+
+/* TOPBAR */
+.top{background:var(--navy);padding:calc(10px + var(--safe-top)) 16px 10px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo{width:34px;height:34px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo i{color:#fff;font-size:17px}
+.brand{flex:1}
+.brand-name{font-size:14px;font-weight:700;color:#fff}
+.brand-sub{font-size:10px;color:rgba(255,255,255,.5)}
+.sync-pill{display:flex;align-items:center;gap:5px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.15);padding:4px 10px;border-radius:20px;cursor:pointer}
+.sync-pill span{font-size:11px;color:rgba(255,255,255,.85);font-weight:500}
+.sync-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0}
+.sync-dot.off{background:#f87171}
+.sync-dot.syncing{background:#fbbf24;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.ro-badge{background:var(--amber3);color:var(--amber);font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+
+/* NAV */
+.nav{background:var(--white);border-bottom:1px solid var(--slate3);display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+.nav::-webkit-scrollbar{display:none}
+.ntab{padding:10px 14px;font-size:12px;font-weight:500;color:var(--slate2);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap;flex-shrink:0;font-family:'Inter',sans-serif;transition:all .15s}
+.ntab.on{color:var(--navy2);border-bottom-color:var(--navy2);font-weight:600}
+.ntab i{font-size:14px}
+.nbadge{min-width:16px;height:16px;background:var(--crimson2);color:#fff;border-radius:8px;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 4px}
+
+/* BODY */
+.body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px 16px;padding-bottom:calc(12px + var(--safe-bottom))}
+.pg{display:none}.pg.on{display:block}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--r);border:1px solid var(--slate3);box-shadow:var(--shadow);overflow:hidden;margin-bottom:10px}
+.card-head{padding:10px 14px;border-bottom:1px solid var(--slate3);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:12px;font-weight:600;color:var(--slate);display:flex;align-items:center;gap:5px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+.kpi-card{background:var(--white);border:1px solid var(--slate3);border-radius:var(--r);padding:10px 12px;box-shadow:var(--shadow);display:flex;align-items:center;gap:10px}
+.kpi-ico{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.kpi-ico i{font-size:15px}
+.kpi-val{font-size:18px;font-weight:700;line-height:1;letter-spacing:-.03em}
+.kpi-lbl{font-size:10px;color:var(--slate2);font-weight:500;margin-top:2px}
+.kpi-sub{font-size:9px;color:var(--slate2);margin-top:1px}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{padding:7px 12px;text-align:left;font-size:10px;font-weight:700;color:var(--slate2);background:var(--slate4);border-bottom:1px solid var(--slate3);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;z-index:1}
+.tbl td{padding:7px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle;white-space:nowrap}
+.tbl tr{cursor:pointer;transition:background .1s}
+.tbl tr:hover td{background:#f8fafc}
+.tbl tr.hl-g td{background:var(--sage4)}.tbl tr.hl-a td{background:var(--amber4)}.tbl tr.hl-r td{background:var(--crimson4)}
+.c-salon{font-weight:600;color:var(--ink);max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.c-ville{color:var(--slate2);max-width:90px;overflow:hidden;text-overflow:ellipsis}
+.c-ca{font-weight:600;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px}
+.c-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600}
+.p-g{background:var(--sage3);color:var(--sage)}.p-a{background:var(--amber3);color:var(--amber)}
+.p-r{background:var(--crimson3);color:var(--crimson)}.p-n{background:var(--navy4);color:var(--navy2)}
+.p-gy{background:var(--slate3);color:var(--slate)}.p-v{background:var(--violet3);color:var(--violet2)}
+
+/* SEARCH */
+.search-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
+.search-wrap{position:relative;flex:1;min-width:140px}
+.search-wrap i{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--slate2);pointer-events:none}
+.search-input{width:100%;padding:8px 10px 8px 32px;border:1px solid var(--slate3);border-radius:var(--r-sm);background:var(--white);font-size:13px;color:var(--ink);font-family:'Inter',sans-serif;outline:none}
+.filter-sel{padding:8px 10px;border:1px solid var(--slate3);border-radius:var(--r-sm);background:var(--white);font-size:13px;color:var(--ink);font-family:'Inter',sans-serif;-webkit-appearance:none;outline:none}
+
+/* BUTTONS */
+.btn{padding:8px 14px;border:1px solid var(--slate3);border-radius:var(--r-sm);background:var(--white);cursor:pointer;font-size:12px;font-weight:500;color:var(--ink);display:inline-flex;align-items:center;gap:5px;font-family:'Inter',sans-serif;box-shadow:var(--shadow);transition:all .15s;white-space:nowrap}
+.btn:active{opacity:.85}
+.btn-primary{background:var(--navy2);color:#fff;border-color:var(--navy2)}
+.btn-success{background:var(--sage);color:#fff;border-color:var(--sage)}
+.btn-danger{background:var(--crimson2);color:#fff;border-color:var(--crimson2)}
+.btn-amber{background:var(--amber2);color:#fff;border-color:var(--amber2)}
+.btn-ghost{background:transparent;border-color:transparent;box-shadow:none}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-icon{width:30px;height:30px;padding:0;display:inline-flex;align-items:center;justify-content:center}
+
+/* PAGER */
+.pager{display:flex;align-items:center;gap:6px;padding:8px 14px;border-top:1px solid var(--slate3);font-size:11px;color:var(--slate2);background:var(--white)}
+
+/* MODAL */
+.overlay{display:none;position:fixed;inset:0;background:rgba(15,34,64,.5);z-index:200;overflow-y:auto;-webkit-overflow-scrolling:touch;backdrop-filter:blur(2px)}
+.overlay.show{display:flex;align-items:flex-end}
+@media(min-width:768px){.overlay.show{align-items:center;justify-content:center}}
+.modal{background:var(--white);border-radius:var(--r-lg) var(--r-lg) 0 0;width:100%;max-height:95vh;overflow-y:auto;box-shadow:var(--shadow-lg)}
+@media(min-width:768px){.modal{border-radius:var(--r-lg);width:560px;max-height:90vh}}
+.modal-head{padding:14px 18px;border-bottom:1px solid var(--slate3);display:flex;align-items:center;gap:10px;position:sticky;top:0;background:var(--white);z-index:1}
+.modal-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-ico i{font-size:16px}
+.modal-head h2{font-size:14px;font-weight:700;flex:1}
+.modal-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+.modal-foot{padding:12px 16px;border-top:1px solid var(--slate3);display:flex;gap:8px;justify-content:flex-end;background:var(--white);position:sticky;bottom:0}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg select,.fg textarea{padding:10px 12px;border:1px solid var(--slate3);border-radius:var(--r-sm);background:var(--white);font-size:14px;color:var(--ink);font-family:'Inter',sans-serif;width:100%;-webkit-appearance:none;outline:none;transition:border-color .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--navy3)}
+.fg textarea{resize:vertical;min-height:70px;line-height:1.5}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sec-title{font-size:10px;font-weight:700;color:var(--navy2);text-transform:uppercase;letter-spacing:.06em;padding:5px 0 4px;border-bottom:2px solid var(--navy4);display:flex;align-items:center;gap:4px}
+
+/* SUB TABS */
+.sub-tabs{display:flex;gap:0;border-bottom:1px solid var(--slate3);margin:0 -16px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.sub-tabs::-webkit-scrollbar{display:none}
+.stab{padding:9px 12px;font-size:11px;font-weight:500;color:var(--slate2);border:none;background:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;font-family:'Inter',sans-serif;display:flex;align-items:center;gap:3px;transition:all .15s}
+.stab.on{color:var(--navy2);border-bottom-color:var(--navy2);font-weight:600}
+.sub-pg{display:none;padding-top:12px}.sub-pg.on{display:block}
+
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.info-item{background:var(--slate4);border-radius:var(--r-sm);padding:9px 11px}
+.info-lbl{font-size:9px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
+.info-val{font-size:12px;font-weight:500;color:var(--ink)}
+
+/* CA COMPARE */
+.ca-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.ca-col{background:var(--slate4);border-radius:var(--r-sm);padding:10px;text-align:center}
+.ca-col.hl{background:var(--navy4)}
+.ca-year{font-size:9px;font-weight:700;color:var(--slate2);text-transform:uppercase;margin-bottom:3px}
+.ca-amount{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace}
+
+/* COMMENTS */
+.com-item{background:var(--slate4);border-radius:var(--r-sm);padding:9px 11px;border-left:3px solid var(--navy3);margin-bottom:6px}
+.com-date{font-size:9px;color:var(--slate2);font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+.com-text{font-size:12px;line-height:1.5}
+
+/* VISITE CARDS */
+.v-card{background:var(--white);border:1px solid var(--slate3);border-radius:var(--r);margin-bottom:7px;display:flex;overflow:hidden;box-shadow:var(--shadow)}
+.v-stripe{width:4px;flex-shrink:0}
+.v-body{flex:1;padding:10px 12px}
+.v-top{display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap}
+.v-salon{font-size:13px;font-weight:600}
+.v-meta{font-size:10px;color:var(--slate2);margin-bottom:4px}
+.v-com{padding:5px 9px;background:var(--slate4);border-radius:var(--r-sm);font-size:11px;color:var(--slate);margin-bottom:4px;border-left:3px solid var(--navy3)}
+.v-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+
+/* HISTORIQUE */
+.h-row{display:flex;gap:12px;padding:10px 14px;border-bottom:1px solid #f1f5f9;align-items:flex-start}
+.h-row:last-child{border-bottom:none}
+.h-date{text-align:center;min-width:34px;flex-shrink:0}
+.h-day{font-size:17px;font-weight:700;line-height:1;color:var(--navy2)}
+.h-mon{font-size:9px;color:var(--slate2);text-transform:uppercase;font-weight:600}
+.h-line{width:1px;background:var(--slate3);flex-shrink:0;align-self:stretch;margin:0 2px}
+.h-info{flex:1;min-width:0}
+
+/* BAR CHART */
+.bar-wrap{padding:10px 14px;display:flex;flex-direction:column;gap:7px}
+.bar-row{display:flex;align-items:center;gap:8px}
+.bar-lbl{font-size:10px;color:var(--slate2);width:75px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:18px;background:var(--slate4);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 7px;min-width:30px}
+.bar-val{font-size:9px;font-weight:700;color:#fff;font-family:'JetBrains Mono',monospace}
+
+/* SUGGEST */
+.sug-box{border:1px solid var(--slate3);border-radius:var(--r-sm);background:var(--white);max-height:180px;overflow-y:auto;display:none;box-shadow:var(--shadow-md);margin-top:3px}
+.sug-item{padding:9px 12px;font-size:12px;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.sug-item:active{background:var(--navy5)}
+
+/* CLIENT PREV */
+.c-prev{padding:10px;background:var(--navy5);border-radius:var(--r-sm);border:1px solid var(--navy4);display:none;flex-direction:column;gap:5px;margin-top:4px}
+.c-prev.show{display:flex}
+
+/* CA TABLE */
+.ca-tbl-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.ca-tbl-row:hover{background:#f8fafc}
+.ca-tbl-row.hl-g{background:var(--sage4)}.ca-tbl-row.hl-r{background:var(--crimson4)}
+.ca-nums{display:flex;gap:12px;flex-shrink:0;text-align:right}
+.ca-num-col{min-width:52px}
+.ca-num{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ca-num-lbl{font-size:9px;color:var(--slate2);text-transform:uppercase}
+
+/* COMMANDES TEL */
+.cmd-item{background:var(--white);border:1px solid var(--slate3);border-radius:var(--r-sm);padding:10px 12px;margin-bottom:6px;box-shadow:var(--shadow)}
+.cmd-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.cmd-salon{font-size:13px;font-weight:600}
+.cmd-mt{font-size:13px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--sage)}
+.cmd-meta{font-size:11px;color:var(--slate2)}
+.cmd-note{font-size:11px;color:var(--slate);margin-top:4px;padding:4px 8px;background:var(--slate4);border-radius:4px}
+
+/* ALERT URGENCE */
+.urgence-item{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer}
+.urgence-item:last-child{border-bottom:none}
+.urgence-item:active{background:var(--slate4)}
+.urg-days{min-width:42px;height:36px;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
+.urg-n{font-size:14px;font-weight:700;line-height:1}
+.urg-l{font-size:8px;font-weight:600;text-transform:uppercase}
+
+/* LOADING */
+.loading{display:none;position:fixed;inset:0;background:rgba(15,34,64,.75);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}
+.loading.show{display:flex}
+.spinner{width:42px;height:42px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-size:13px;font-weight:500;color:#fff}
+
+.empty{padding:32px 20px;text-align:center;color:var(--slate2)}
+.empty i{font-size:36px;display:block;margin-bottom:10px;opacity:.3}
+.empty p{font-size:12px;font-weight:500}
+
+@media(min-width:768px){
+  .body{padding:16px 28px}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .top{padding:12px 24px}
+  .nav{padding:0 12px}
+  .ntab{padding:11px 16px;font-size:13px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><i class="ti ti-scissors"></i></div>
+    <div class="login-title">CRM 2026</div>
+    <div class="login-sub">Salons de coiffure — Secteurs 102 & 112</div>
+    <input class="login-input" id="pwInput" type="password" placeholder="Mot de passe..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Accéder</button>
+    <div class="login-error" id="loginErr">Mot de passe incorrect</div>
+  </div>
+</div>
+
+<div class="app" id="mainApp" style="display:none">
+<!-- TOPBAR -->
+<div class="top">
+  <div class="logo"><i class="ti ti-scissors"></i></div>
+  <div class="brand">
+    <div class="brand-name">CRM 2026 <span id="roTag" class="ro-badge" style="display:none">LECTURE SEULE</span></div>
+    <div class="brand-sub">Secteurs 102 & 112 · 475 clients</div>
+  </div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <div class="sync-pill" onclick="repairCA()" style="background:rgba(255,200,0,.2);cursor:pointer">
+      <i class="ti ti-tool" style="font-size:12px;color:#ffd700"></i>
+      <span style="font-size:10px;color:#ffd700">Réparer CA</span>
+    </div>
+    <div class="sync-pill" id="syncPill" onclick="syncNow()">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncTxt">Connexion...</span>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav" id="mainNav">
+  <button class="ntab on" onclick="gp('dash',this)"><i class="ti ti-layout-dashboard"></i> Dashboard</button>
+  <button class="ntab" onclick="gp('clients',this)"><i class="ti ti-users"></i> Clients</button>
+  <button class="ntab rw-only" onclick="gp('visites',this)"><i class="ti ti-calendar-event"></i> Visites <span class="nbadge" id="nb-vis" style="display:none">0</span></button>
+  <button class="ntab" onclick="gp('ca',this)"><i class="ti ti-chart-bar"></i> CA 2026</button>
+  <button class="ntab rw-only" onclick="gp('commandes',this)"><i class="ti ti-phone"></i> Commandes tél.</button>
+  <button class="ntab rw-only" onclick="gp('hist',this)"><i class="ti ti-history"></i> Historique</button>
+</div>
+
+<!-- BODY -->
+<div class="body">
+
+<!-- DASHBOARD -->
+<div class="pg on" id="pg-dash">
+  <div class="kpi-grid" id="dKpis"></div>
+  <div class="card">
+    <div class="card-head"><div class="card-title"><i class="ti ti-alarm" style="color:var(--crimson2)"></i> Clients à visiter en urgence</div><span class="pill p-r" id="dUrgCt">0</span></div>
+    <div id="dUrgence"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title"><i class="ti ti-crown" style="color:var(--amber2)"></i> Top 10 CA 2026</div></div>
+    <div id="dTop10"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title"><i class="ti ti-map-pin" style="color:var(--navy3)"></i> CA 2026 par ville</div></div>
+    <div class="bar-wrap" id="dVilles"></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><div class="card-title"><i class="ti ti-alert-circle" style="color:var(--crimson2)"></i> À relancer — CA 2026 = 0</div><span class="pill p-r" id="dRelCt">0</span></div>
+    <div id="dRelance"></div>
+  </div>
+  <div class="card">
+    <div class="card-head" style="background:var(--violet3)">
+      <div class="card-title" style="color:var(--violet)"><i class="ti ti-clipboard-list"></i> Tâches & Retours produits <span class="pill p-v" id="dTaskCt" style="margin-left:4px">0</span></div>
+      <button class="btn btn-sm" style="background:var(--violet2);color:#fff;border-color:var(--violet2)" onclick="openTaskM()"><i class="ti ti-plus"></i> Ajouter</button>
+    </div>
+    <div id="dTasks"></div>
+  </div>
+</div>
+
+<!-- CLIENTS -->
+<div class="pg" id="pg-clients">
+  <div class="search-row">
+    <div class="search-wrap">
+      <i class="ti ti-search"></i>
+      <input class="search-input" id="sC" type="search" placeholder="Salon, nom, ville, Kd-Nr..." oninput="rC()" autocomplete="off">
+    </div>
+    <select class="filter-sel" id="fSt" onchange="rC()">
+      <option value="">Tous statuts</option>
+      <option>Actif</option><option>VIP</option><option>Inactif</option><option>Prospect</option><option>Perdu</option>
+    </select>
+    <select class="filter-sel" id="fSek" onchange="rC()">
+      <option value="">Tous secteurs</option>
+      <option value="102">Sek 102</option><option value="112">Sek 112</option>
+    </select>
+    <button class="btn btn-primary btn-sm rw-only" onclick="openCM(null)"><i class="ti ti-plus"></i> Nouveau</button>
+  </div>
+  <div class="card" style="overflow:hidden">
+    <div class="pager" style="border-top:none;border-bottom:1px solid var(--slate3)">
+      <span id="cCount" style="font-weight:600"></span>
+      <div style="display:flex;gap:5px;margin-left:auto">
+        <button class="btn btn-sm btn-icon" onclick="cPg(-1)"><i class="ti ti-chevron-left"></i></button>
+        <span id="cPi" style="padding:3px 6px;font-size:11px;align-self:center"></span>
+        <button class="btn btn-sm btn-icon" onclick="cPg(1)"><i class="ti ti-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="tbl-wrap">
+      <table class="tbl">
+        <thead><tr>
+          <th></th><th>Salon</th><th>Ville</th><th>Tél.</th>
+          <th style="text-align:right">CA 2026</th><th style="text-align:right">CA 2025</th>
+          <th style="text-align:right">Évol.</th><th>Statut</th><th>Proch. visite</th><th>Dernière visite</th>
+        </tr></thead>
+        <tbody id="cTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- VISITES -->
+<div class="pg" id="pg-visites">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;gap:8px">
+    <div class="search-row" style="margin:0;flex:1">
+      <div class="search-wrap" style="flex:1"><i class="ti ti-search"></i>
+        <input class="search-input" id="sV" type="search" placeholder="Rechercher..." oninput="rV()"></div>
+      <select class="filter-sel" id="fVS" onchange="rV()">
+        <option value="">Tous</option><option>Planifiée</option><option>Validée</option><option>En retard</option>
+      </select>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openVM(null)"><i class="ti ti-plus"></i> Nouvelle</button>
+  </div>
+  <div id="vCards"></div>
+</div>
+
+<!-- CA 2026 -->
+<div class="pg" id="pg-ca">
+  <div class="search-row">
+    <div class="search-wrap" style="flex:1"><i class="ti ti-search"></i>
+      <input class="search-input" id="sCA" type="search" placeholder="Rechercher..." oninput="rCA()"></div>
+    <select class="filter-sel" id="fCA" onchange="rCA()">
+      <option value="all">Tous</option><option value="active">Avec CA 2026</option><option value="zero">CA 2026 = 0</option>
+    </select>
+  </div>
+  <div class="kpi-grid" id="caKpis" style="margin-bottom:10px"></div>
+  <div class="card"><div id="caList"></div></div>
+</div>
+
+<!-- COMMANDES TEL -->
+<div class="pg" id="pg-commandes">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <div class="search-row" style="margin:0;flex:1">
+      <div class="search-wrap" style="flex:1"><i class="ti ti-search"></i>
+        <input class="search-input" id="sCMD" type="search" placeholder="Rechercher..." oninput="rCMD()"></div>
+    </div>
+    <button class="btn btn-amber btn-sm" onclick="openCmdM(null)"><i class="ti ti-plus"></i> Nouvelle commande</button>
+  </div>
+  <div class="kpi-grid" id="cmdKpis" style="margin-bottom:10px"></div>
+  <div class="card"><div id="cmdList"></div></div>
+</div>
+
+<!-- HISTORIQUE -->
+<div class="pg" id="pg-hist">
+  <div class="search-row">
+    <div class="search-wrap" style="flex:1"><i class="ti ti-search"></i>
+      <input class="search-input" id="sH" type="search" placeholder="Rechercher..." oninput="rH()"></div>
+  </div>
+  <div class="card"><div id="hList"></div></div>
+</div>
+
+</div></div>
+
+<!-- MODAL TACHE -->
+<div class="overlay" id="ovTask">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-ico" style="background:var(--violet3)"><i class="ti ti-clipboard-list" style="color:var(--violet2)"></i></div>
+    <h2 id="taskTitle">Nouvelle tâche</h2>
+    <button class="btn btn-ghost btn-icon" onclick="cOv('ovTask')"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="taskId">
+    <div class="fg"><label>Type</label>
+      <select id="taskType">
+        <option value="tache">📋 Tâche à réaliser</option>
+        <option value="retour">📦 Retour produit</option>
+        <option value="rappel">📞 Rappel client</option>
+        <option value="autre">⭐ Autre</option>
+      </select>
+    </div>
+    <div class="fg"><label>Client concerné (optionnel)</label>
+      <input id="taskSrch" type="search" placeholder="Nom du salon..." oninput="srchGeneric(this.value,'taskSug','taskCid','taskSrch','taskPrev')" autocomplete="off">
+      <div class="sug-box" id="taskSug"></div>
+      <div class="c-prev" id="taskPrev"></div>
+      <input type="hidden" id="taskCid">
+    </div>
+    <div class="fg"><label>Description</label>
+      <textarea id="taskDesc" placeholder="Décrivez la tâche ou le retour produit..." rows="3"></textarea>
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Priorité</label>
+        <select id="taskPrio">
+          <option value="normal">Normale</option>
+          <option value="haute">🔴 Haute</option>
+          <option value="basse">🟢 Basse</option>
+        </select>
+      </div>
+      <div class="fg"><label>Échéance</label>
+        <input id="taskDate" type="date">
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" onclick="cOv('ovTask')">Annuler</button>
+    <button class="btn btn-primary" style="background:var(--violet2);border-color:var(--violet2)" onclick="svTask()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- LOADING -->
+<div class="loading" id="loadingOv">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingTxt">Connexion...</div>
+</div>
+
+<!-- MODAL CLIENT -->
+<div class="overlay" id="ovClient">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-ico" id="cmIco" style="background:var(--navy4)"><i class="ti ti-user" style="color:var(--navy2)"></i></div>
+    <h2 id="cmTitle">Fiche client</h2>
+    <button class="btn btn-ghost btn-icon" onclick="cOv('ovClient')"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="sub-tabs">
+    <button class="stab on" onclick="gSub('info',this)"><i class="ti ti-info-circle"></i> Infos</button>
+    <button class="stab" onclick="gSub('ca',this)"><i class="ti ti-chart-bar"></i> CA</button>
+    <button class="stab rw-only" onclick="gSub('comments',this)"><i class="ti ti-message-2"></i> Notes</button>
+    <button class="stab rw-only" onclick="gSub('visite',this)"><i class="ti ti-calendar-event"></i> Visite</button>
+    <button class="stab rw-only" onclick="gSub('edit',this)"><i class="ti ti-edit"></i> Modifier</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="cmId">
+    <!-- INFOS -->
+    <div class="sub-pg on" id="sub-info">
+      <div class="info-grid">
+        <div class="info-item"><div class="info-lbl">Kd-Nr</div><div class="info-val" id="di-kd" style="font-family:'JetBrains Mono',monospace"></div></div>
+        <div class="info-item"><div class="info-lbl">Section</div><div class="info-val" id="di-sek"></div></div>
+        <div class="info-item" style="grid-column:1/-1"><div class="info-lbl">Salon</div><div class="info-val" id="di-salon" style="font-weight:700;font-size:14px"></div></div>
+        <div class="info-item"><div class="info-lbl">Nom & Prénom</div><div class="info-val" id="di-nom"></div></div>
+        <div class="info-item"><div class="info-lbl">Ville</div><div class="info-val" id="di-ville"></div></div>
+        <div class="info-item"><div class="info-lbl">Tél. 1</div><div class="info-val" id="di-t1" style="font-family:'JetBrains Mono',monospace"></div></div>
+        <div class="info-item"><div class="info-lbl">Tél. 2</div><div class="info-val" id="di-t2" style="font-family:'JetBrains Mono',monospace"></div></div>
+        <div class="info-item" style="grid-column:1/-1">
+          <div class="info-lbl">Adresse</div>
+          <div class="info-val" id="di-rue"></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-sm btn-primary" onclick="openMaps('google')" style="flex:1">
+              <i class="ti ti-map-pin"></i> Google Maps
+            </button>
+            <button class="btn btn-sm" onclick="openMaps('waze')" style="flex:1;background:#00d4ff;color:#fff;border-color:#00d4ff">
+              <i class="ti ti-navigation"></i> Waze
+            </button>
+            <button class="btn btn-sm" onclick="openMaps('apple')" style="flex:1;background:#555;color:#fff;border-color:#555">
+              <i class="ti ti-map-2"></i> Plans
+            </button>
+          </div>
+        </div>
+        <div class="info-item"><div class="info-lbl">Statut</div><div class="info-val" id="di-statut"></div></div>
+        <div class="info-item"><div class="info-lbl">Dernière visite</div><div class="info-val" id="di-lv"></div></div>
+        <div class="info-item"><div class="info-lbl">Prochaine visite</div><div class="info-val" id="di-nv"></div></div>
+        <div class="info-item"><div class="info-lbl">Nb visites</div><div class="info-val" id="di-nbv"></div></div>
+      </div>
+      <div id="di-tasks-wrap" style="display:none;margin-top:6px">
+        <div class="info-item" style="border-left:3px solid var(--amber2)"><div class="info-lbl" style="color:var(--amber)">Tâches</div><div class="info-val" id="di-tasks"></div></div>
+      </div>
+      <div id="di-opp-wrap" style="display:none;margin-top:6px">
+        <div class="info-item" style="border-left:3px solid var(--violet2)"><div class="info-lbl" style="color:var(--violet2)">Opportunité</div><div class="info-val" id="di-opp"></div></div>
+      </div>
+    </div>
+    <!-- CA -->
+    <div class="sub-pg" id="sub-ca">
+      <div class="ca-compare">
+        <div class="ca-col"><div class="ca-year">2024</div><div class="ca-amount" id="di-ca24" style="color:var(--slate2)"></div></div>
+        <div class="ca-col"><div class="ca-year">2025</div><div class="ca-amount" id="di-ca25" style="color:var(--navy2)"></div></div>
+        <div class="ca-col hl"><div class="ca-year" style="color:var(--navy2)">2026</div><div class="ca-amount" id="di-ca26" style="color:var(--sage)"></div><div id="di-evol" style="font-size:10px;margin-top:2px"></div></div>
+      </div>
+      <div class="fg rw-only">
+        <label>Ajouter commande (CHF → CA 2026)</label>
+        <div style="display:flex;gap:8px">
+          <input id="di-cmd" type="number" inputmode="decimal" placeholder="Montant CHF" style="flex:1;padding:10px 12px;border:1px solid var(--slate3);border-radius:var(--r-sm);font-size:14px;font-family:'Inter',sans-serif;outline:none">
+          <button class="btn btn-success" onclick="addCommande()"><i class="ti ti-plus"></i> Ajouter</button>
+        </div>
+      </div>
+    </div>
+    <!-- COMMENTS -->
+    <div class="sub-pg" id="sub-comments">
+      <div class="fg"><label>Nouveau commentaire</label>
+        <textarea id="di-newcom" placeholder="Note sur ce client..." rows="3"></textarea></div>
+      <button class="btn btn-primary" onclick="addComment()"><i class="ti ti-send"></i> Enregistrer</button>
+      <div id="di-comlist" style="margin-top:8px"></div>
+    </div>
+    <!-- VISITE -->
+    <div class="sub-pg" id="sub-visite">
+      <div class="sec-title"><i class="ti ti-calendar-plus"></i> Planifier une visite</div>
+      <div class="fg-row">
+        <div class="fg"><label>Date</label><input id="di-vdate" type="date"></div>
+        <div class="fg"><label>Heure</label><input id="di-vheure" type="time"></div>
+      </div>
+      <div class="fg"><label>Objet</label>
+        <select id="di-vobjet"><option value="">Sélectionner...</option>
+          <option>Visite découverte</option><option>Suivi commande</option>
+          <option>Présentation nouveautés</option><option>Formation produit</option>
+          <option>Relance inactif</option><option>Résolution problème</option>
+          <option>Visite fidélisation</option></select></div>
+      <div class="fg"><label>Priorité</label>
+        <select id="di-vprio"><option value="">Normale</option><option>Haute</option><option>Moyenne</option><option>Basse</option></select></div>
+      <button class="btn btn-primary" onclick="planifierVisite()"><i class="ti ti-calendar-check"></i> Planifier</button>
+      <div class="sec-title" style="margin-top:12px"><i class="ti ti-circle-check"></i> Valider une visite</div>
+      <div class="fg"><label>Compte-rendu</label><textarea id="di-vcr" placeholder="Résultat de la visite..." rows="2"></textarea></div>
+      <div class="fg-row">
+        <div class="fg"><label>Commande (CHF)</label><input id="di-vcmd" type="number" inputmode="decimal" placeholder="0"></div>
+        <div class="fg"><label>Opportunité</label><input id="di-vopp" placeholder="Intérêt détecté..."></div>
+      </div>
+      <button class="btn btn-success" onclick="validerVisite()"><i class="ti ti-check"></i> Valider la visite</button>
+    </div>
+    <!-- MODIFIER -->
+    <div class="sub-pg" id="sub-edit">
+      <div class="sec-title"><i class="ti ti-building-store"></i> Identité</div>
+      <div class="fg-row">
+        <div class="fg"><label>Kd-Nr</label><input id="ed-kd" inputmode="numeric"></div>
+        <div class="fg"><label>Section</label><select id="ed-sek"><option>102</option><option>112</option></select></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Nom</label><input id="ed-nom"></div>
+        <div class="fg"><label>Prénom</label><input id="ed-pr"></div>
+      </div>
+      <div class="fg"><label>Salon</label><input id="ed-sal"></div>
+      <div class="fg"><label>Adresse</label><input id="ed-rue"></div>
+      <div class="fg-row">
+        <div class="fg"><label>NPA</label><input id="ed-npa" inputmode="numeric"></div>
+        <div class="fg"><label>Ville</label><input id="ed-vil"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Tél. 1</label><input id="ed-t1" type="tel"></div>
+        <div class="fg"><label>Tél. 2</label><input id="ed-t2" type="tel"></div>
+      </div>
+      <div class="sec-title" style="margin-top:4px"><i class="ti ti-settings"></i> Statut</div>
+      <div class="fg"><label>Statut</label>
+        <select id="ed-st"><option>Actif</option><option>VIP</option><option>Inactif</option><option>Prospect</option><option>Perdu</option></select></div>
+      <div class="fg"><label>Opportunité</label><input id="ed-opp"></div>
+      <div class="fg"><label>Tâches</label><textarea id="ed-tasks" rows="2"></textarea></div>
+      <button class="btn btn-primary" style="margin-top:4px" onclick="saveEdit()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- MODAL VISITE -->
+<div class="overlay" id="ovVisite">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-ico" style="background:var(--violet3)"><i class="ti ti-calendar-plus" style="color:var(--violet2)"></i></div>
+    <h2 id="vmTitle">Nouvelle visite</h2>
+    <button class="btn btn-ghost btn-icon" onclick="cOv('ovVisite')"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="vmId">
+    <div class="fg"><label>Client</label>
+      <input id="vmSrch" type="search" placeholder="Kd-Nr ou nom du salon..." oninput="srchC(this.value)" autocomplete="off">
+      <div class="sug-box" id="vmSug"></div>
+      <div class="c-prev" id="vmPrev"></div>
+      <input type="hidden" id="vmCid">
+    </div>
+    <div class="fg-row">
+      <div class="fg"><label>Date</label><input id="vmD" type="date"></div>
+      <div class="fg"><label>Heure</label><input id="vmH" type="time"></div>
+    </div>
+    <div class="fg"><label>Objet</label>
+      <select id="vmOb"><option value="">Sélectionner...</option>
+        <option>Visite découverte</option><option>Suivi commande</option>
+        <option>Présentation nouveautés</option><option>Formation produit</option>
+        <option>Relance inactif</option><option>Résolution problème</option>
+        <option>Visite fidélisation</option></select></div>
+    <div class="fg-row">
+      <div class="fg"><label>Priorité</label><select id="vmPr"><option value="">Normale</option><option>Haute</option><option>Moyenne</option><option>Basse</option></select></div>
+      <div class="fg"><label>Statut</label><select id="vmSt"><option value="Planifiée">Planifiée</option><option value="Validée">Validée</option></select></div>
+    </div>
+    <div class="fg"><label>Commentaire</label><textarea id="vmCom" placeholder="Notes..." rows="2"></textarea></div>
+    <div class="fg-row">
+      <div class="fg"><label>Commande (CHF)</label><input id="vmCmd" type="number" inputmode="decimal" placeholder="0"></div>
+      <div class="fg"><label>Opportunité</label><input id="vmOp"></div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" onclick="cOv('ovVisite')">Annuler</button>
+    <button class="btn btn-success" id="vmValBtn" onclick="doVal(null)" style="display:none"><i class="ti ti-circle-check"></i> Valider</button>
+    <button class="btn btn-primary" onclick="svV()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<!-- MODAL COMMANDE TEL -->
+<div class="overlay" id="ovCmd">
+<div class="modal">
+  <div class="modal-head">
+    <div class="modal-ico" style="background:var(--amber3)"><i class="ti ti-phone" style="color:var(--amber)"></i></div>
+    <h2 id="cmdTitle">Nouvelle commande téléphone</h2>
+    <button class="btn btn-ghost btn-icon" onclick="cOv('ovCmd')"><i class="ti ti-x"></i></button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="cmdId">
+    <div class="fg"><label>Client</label>
+      <input id="cmdSrch" type="search" placeholder="Kd-Nr ou nom du salon..." oninput="srchCCmd(this.value)" autocomplete="off">
+      <div class="sug-box" id="cmdSug"></div>
+      <div class="c-prev" id="cmdPrev"></div>
+      <input type="hidden" id="cmdCid">
+    </div>
+    <div class="sec-title"><i class="ti ti-receipt"></i> Commande</div>
+    <div class="fg-row">
+      <div class="fg"><label>Montant (CHF)</label><input id="cmdMt" type="number" inputmode="decimal" placeholder="0"></div>
+      <div class="fg"><label>Date</label><input id="cmdDate" type="date"></div>
+    </div>
+    <div class="fg"><label>Produits / Description</label><textarea id="cmdDesc" placeholder="Ex: Coloration L'Oréal x3, Shampoing..." rows="2"></textarea></div>
+    <div class="sec-title"><i class="ti ti-phone-call"></i> Suivi appel</div>
+    <div class="fg-row">
+      <div class="fg"><label>Durée (min)</label><input id="cmdDur" type="number" inputmode="decimal" placeholder="5"></div>
+      <div class="fg"><label>Résultat</label>
+        <select id="cmdRes"><option value="">Sélectionner...</option>
+          <option>Commande passée</option><option>Rappel à prévoir</option>
+          <option>Pas intéressé</option><option>Message laissé</option>
+          <option>Pas de réponse</option></select></div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="cmdNote" placeholder="Remarques sur l'appel..." rows="2"></textarea></div>
+  </div>
+  <div class="modal-foot">
+    <button class="btn" onclick="cOv('ovCmd')">Annuler</button>
+    <button class="btn btn-amber" onclick="svCmd()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+const PW_FULL = 'Kawazaki.100';
+const PW_READ = 'Dicopar102';
+let isReadOnly = false;
+
+function doLogin() {
+  const pw = document.getElementById('pwInput').value;
+  if(pw === PW_FULL) {
+    isReadOnly = false;
+    startApp();
+  } else if(pw === PW_READ) {
+    isReadOnly = true;
+    startApp();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+function startApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'flex';
+  if(isReadOnly) {
+    document.getElementById('roTag').style.display = '';
+    // Hide write-only elements
+    document.querySelectorAll('.rw-only').forEach(el => el.style.display = 'none');
+  }
+  boot();
+}
+
+// ═══════════════════════════════════════
+// FIREBASE
+// ═══════════════════════════════════════
+const FB_CFG = {
+  apiKey:"AIzaSyD8m1YVvIs4aXx0KUrixCRd-wnbuW5QFNQ",
+  projectId:"crm-2026-salons"
+};
+const FB_URL = `https://firestore.googleapis.com/v1/projects/${FB_CFG.projectId}/databases/(default)/documents`;
+
+function toFS(obj) {
+  const fields = {};
+  for(const [k,v] of Object.entries(obj)) {
+    if(v===null||v===undefined) fields[k]={nullValue:null};
+    else if(typeof v==='boolean') fields[k]={booleanValue:v};
+    else if(typeof v==='number') fields[k]={doubleValue:v};
+    else if(typeof v==='string') fields[k]={stringValue:v};
+    else if(Array.isArray(v)) fields[k]={stringValue:JSON.stringify(v)};
+    else if(typeof v==='object') fields[k]={stringValue:JSON.stringify(v)};
+    else fields[k]={stringValue:String(v)};
+  }
+  return {fields};
+}
+
+function fromFS(doc) {
+  if(!doc||!doc.fields) return null;
+  const obj={};
+  for(const [k,v] of Object.entries(doc.fields)) {
+    if('nullValue' in v) obj[k]=null;
+    else if('booleanValue' in v) obj[k]=v.booleanValue;
+    else if('doubleValue' in v) obj[k]=v.doubleValue;
+    else if('integerValue' in v) obj[k]=Number(v.integerValue);
+    else if('stringValue' in v) {
+      // Don't auto-parse 'data' field - return raw string
+      if(k==='data') obj[k]=v.stringValue;
+      else { try{obj[k]=JSON.parse(v.stringValue);}catch(e){obj[k]=v.stringValue;} }
+    }
+    else obj[k]=null;
+  }
+  return obj;
+}
+
+async function fsGet(col) {
+  const res = await fetch(`${FB_URL}/${col}?pageSize=500`,{headers:{'Content-Type':'application/json'}});
+  if(!res.ok) return [];
+  const data = await res.json();
+  return (data.documents||[]).map(doc=>({_id:doc.name.split('/').pop(),...fromFS(doc)}));
+}
+
+async function fsSet(col, id, data) {
+  const res = await fetch(`${FB_URL}/${col}/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(toFS(data))});
+  return res.ok;
+}
+
+async function fsAdd(col, data) {
+  const res = await fetch(`${FB_URL}/${col}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(toFS(data))});
+  if(!res.ok) return null;
+  const doc = await res.json();
+  return doc.name.split('/').pop();
+}
+
+async function fsDel(col, id) {
+  const res = await fetch(`${FB_URL}/${col}/${id}`,{method:'DELETE'});
+  return res.ok;
+}
+
+// Real-time polling
+let pollTimer = null;
+function startPolling() {
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(async () => {
+    if(!isOnline) return;
+    try {
+      // Check all_clients for updates
+      const metaRes = await fetch(`${FB_URL}/meta/all_clients`,{headers:{'Content-Type':'application/json'}});
+      if(metaRes.ok) {
+        const metaDoc = await metaRes.json();
+        const metaData = fromFS(metaDoc);
+        if(metaData && metaData.data && typeof metaData.data === 'string') {
+          // Always update if Firebase has newer timestamp
+          const fbUpdated = metaData.updated || '';
+          if(fbUpdated !== lastUpdated) {
+            try {
+              const fresh = Array.isArray(metaData.data) ? metaData.data : JSON.parse(metaData.data);
+              if(fresh && fresh.length > 0) {
+                lastUpdated = fbUpdated;
+                clients = fresh.map(c=>({...c,
+                  comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),
+                  ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+                localStorage.setItem('crm_clients', JSON.stringify(clients));
+                rDash(); rC(); rCA();
+                setSyncUI('ok','🔄 '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+              }
+            } catch(pe) { console.error('Poll parse error:', pe); }
+          }
+        }
+      }
+      // Also check visites
+      const vsRes = await fetch(`${FB_URL}/visites?pageSize=500`,{headers:{'Content-Type':'application/json'}});
+      if(vsRes.ok) {
+        const vsData = await vsRes.json();
+        const newV = (vsData.documents||[]).map(doc=>({_id:doc.name.split('/').pop(),...fromFS(doc)}));
+        if(JSON.stringify(newV.map(v=>v._id)) !== JSON.stringify(visites.map(v=>v._id))) {
+          visites = newV;
+          rV(); updateVisBadge();
+        }
+      }
+    } catch(e) {}
+  }, 10000); // Poll every 10 seconds
+}
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+let clients=[], visites=[], hist=[], commandes=[], tasks=[];
+let cpg=1; const PER=50;
+let currentClientId=null;
+let isOnline=navigator.onLine;
+let lastUpdated=null;
+let pendingChanges=JSON.parse(localStorage.getItem('crm_pending')||'{"clients":{},"visites":{},"hist":[],"cmds":[]}');
+
+window.addEventListener('online',()=>{isOnline=true;setSyncUI('syncing','Connexion rétablie...');flushPending();});
+window.addEventListener('offline',()=>{isOnline=false;setSyncUI('error','Hors ligne — données locales');});
+// Override - always try Firebase regardless of navigator.onLine
+isOnline = true;
+
+// Always assume online and let Firebase calls fail if needed
+async function testConnectivity(){ return true; }
+
+function savePending(){localStorage.setItem('crm_pending',JSON.stringify(pendingChanges));}
+function countPending(){return Object.keys(pendingChanges.clients||{}).length+Object.keys(pendingChanges.visites||{}).length+(pendingChanges.hist||[]).length+(pendingChanges.cmds||[]).length;}
+
+async function flushPending(){
+  if(!isOnline) return;
+  const n=countPending();
+  if(n===0){setSyncUI('ok','Synchronisé '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));return;}
+  setSyncUI('syncing','Envoi de '+n+' modification(s)...');
+  try{
+    if(Object.keys(pendingChanges.clients||{}).length>0){
+      const allData=clients.map(cl=>({...cl,comments:JSON.stringify(cl.comments||[])}));
+      await fsSet('meta','all_clients',{data:JSON.stringify(allData),count:allData.length,updated:new Date().toISOString()});
+      pendingChanges.clients={};
+    }
+    for(const [id,v] of Object.entries(pendingChanges.visites||{})){
+      if(v._id) await fsSet('visites',v._id,v); else{const nid=await fsAdd('visites',v);if(nid)v._id=nid;}
+    }
+    pendingChanges.visites={};
+    for(const h of (pendingChanges.hist||[])) await fsAdd('historique',h);
+    pendingChanges.hist=[];
+    for(const c of (pendingChanges.cmds||[])) await fsAdd('commandes',c);
+    pendingChanges.cmds=[];
+    savePending();
+    setSyncUI('ok','Synchronisé ✓ '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+  }catch(e){setSyncUI('error','Erreur sync — '+countPending()+' en attente');}
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
+function td(){return new Date().toISOString().slice(0,10)}
+function fmt(d){if(!d)return'—';try{const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`}catch(e){return d}}
+function fCHF(n){const v=Number(n||0);if(isNaN(v))return'0';return v===0?'0':v.toLocaleString('fr-CH')}
+function ini(s){return(s||'?').split(/\s+/).filter(Boolean).map(w=>w[0]||'').slice(0,2).join('').toUpperCase()}
+function avBg(st){return{VIP:'var(--amber3)',Inactif:'var(--slate3)',Perdu:'var(--slate3)',Prospect:'var(--navy4)'}[st]||'var(--navy4)'}
+function avFg(st){return{VIP:'var(--amber)',Inactif:'var(--slate2)',Perdu:'var(--slate2)',Prospect:'var(--navy2)'}[st]||'var(--navy2)'}
+function pCl(st){return{Actif:'p-g',VIP:'p-a',Inactif:'p-gy',Prospect:'p-n',Perdu:'p-r'}[st]||'p-g'}
+function daysSince(d){if(!d)return 9999;return Math.floor((new Date()-new Date(d))/86400000);}
+function vStat(v){
+  if(v.statut==='Validée')return'Validée';
+  if(!v.date)return'Planifiée';
+  const d=new Date(v.date),t=new Date();t.setHours(0,0,0,0);
+  if(d<t)return'En retard';
+  if(v.date===td())return'Aujourdhui';
+  return'Planifiée';
+}
+
+// ═══════════════════════════════════════
+// SYNC UI
+// ═══════════════════════════════════════
+function setSyncUI(state,txt){
+  const dot=document.getElementById('syncDot');
+  document.getElementById('syncTxt').textContent=txt;
+  dot.className='sync-dot'+(state==='ok'?'':state==='syncing'?' syncing':' off');
+}
+function showLoading(txt){document.getElementById('loadingTxt').textContent=txt;document.getElementById('loadingOv').classList.add('show');}
+function hideLoading(){document.getElementById('loadingOv').classList.remove('show');}
+
+// ═══════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════
+async function boot(){
+  showLoading('Chargement des données...');
+  setSyncUI('syncing','Connexion...');
+  try {
+    let fsClients=[];
+    // Always try Firebase first
+    isOnline = true;
+    // TOUJOURS charger depuis Firebase en priorité
+    if(isOnline) {
+      try {
+        const metaRes=await fetch(`${FB_URL}/meta/all_clients`,{headers:{'Content-Type':'application/json'}});
+        if(metaRes.ok){
+          const metaDoc=await metaRes.json();
+          const metaData=fromFS(metaDoc);
+          if(metaData&&metaData.data&&typeof metaData.data==='string'){
+            fsClients=JSON.parse(metaData.data);
+            lastUpdated=metaData.updated;
+            // Mettre à jour le cache local avec les données Firebase
+            localStorage.setItem('crm_clients',JSON.stringify(fsClients));
+            setSyncUI('ok','Synchronisé '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+          }
+        }
+      } catch(e) {
+        console.error('Firebase error:', e);
+        // Fallback cache local seulement si Firebase indisponible
+        try {
+          const lsC=localStorage.getItem('crm_clients');
+          if(lsC) fsClients=JSON.parse(lsC);
+        } catch(le) { localStorage.removeItem('crm_clients'); }
+        setSyncUI('error','Hors ligne — cache local');
+      }
+    } else {
+      // Hors ligne - cache local
+      try {
+        const lsC=localStorage.getItem('crm_clients');
+        if(lsC) fsClients=JSON.parse(lsC);
+      } catch(le) { localStorage.removeItem('crm_clients'); }
+      setSyncUI('error','Hors ligne — données locales');
+    }
+    if(fsClients.length===0){
+      showLoading('Premier import : 475 clients...');
+      const allClients=RAW_CLIENTS.map((r,i)=>({
+        id:'c_'+(r[0]||i),kdnr:r[0]||'',sek:r[1]||'',nom:r[2]||'',prenom:r[3]||'',
+        salon:r[4]||r[2]||'',rue:r[5]||'',npa:r[6]||'',ville:r[7]||'',
+        tel1:r[8]||'',tel2:r[9]||'',
+        ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,
+        statut:r[13]||'Actif',comments:'[]',lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''
+      }));
+      await fsSet('meta','all_clients',{data:JSON.stringify(allClients),count:allClients.length,updated:new Date().toISOString()});
+      fsClients=allClients;
+    }
+    clients=fsClients.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+    // Debug: check CA totals
+    const ca26total = clients.reduce((s,c)=>s+Number(c.ca26||0),0);
+    console.log('Loaded clients CA26 total:', ca26total, 'from', clients.length, 'clients');
+
+    showLoading('Chargement des visites...');
+    const fsV=await fsGet('visites');
+    visites=fsV;
+    localStorage.setItem('crm_visites',JSON.stringify(visites));
+
+    showLoading('Chargement de l\'historique...');
+    const fsH=await fsGet('historique');
+    hist=fsH.sort((a,b)=>new Date(b.dateArchivage||0)-new Date(a.dateArchivage||0));
+    
+    showLoading('Chargement des tâches...');
+    await loadTasks();
+
+    showLoading('Chargement des commandes...');
+    const fsCMD=await fsGet('commandes');
+    commandes=fsCMD.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+
+    setSyncUI('ok','Synchronisé '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+    hideLoading();
+
+    // Flush any pending offline changes
+    if(countPending()>0) await flushPending();
+
+    // Start real-time polling
+    startPolling();
+
+    rDash();rC();rV();rCA();rCMD();rH();rTasks();updateVisBadge();
+
+  } catch(e) {
+    console.error(e);
+    setSyncUI('error','Hors ligne — cache local');
+    hideLoading();
+    try {
+      const lsRaw=localStorage.getItem('crm_clients');
+      if(lsRaw) {
+        clients=JSON.parse(lsRaw).map(c=>({...c,
+          comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),
+          ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+      } else {
+        clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''}));
+      }
+    } catch(lsErr) { 
+      localStorage.removeItem('crm_clients');
+      clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''}));
+    }
+    const lsV=localStorage.getItem('crm_visites');
+    if(lsV) visites=JSON.parse(lsV);
+    rDash();rC();rV();rCA();rCMD();rH();rTasks();updateVisBadge();
+  }
+}
+
+
+async function repairCA(){
+  setSyncUI('syncing','Réparation CA 2026...');
+  try {
+    const fsH=await fsGet('historique');
+    // Map by BOTH clientId AND salon name (IDs may have changed after reimport)
+    const caMapById={};
+    const caMapBySalon={};
+    fsH.forEach(h=>{
+      if(h.commande&&Number(h.commande)>0){
+        if(h.clientId) caMapById[h.clientId]=(caMapById[h.clientId]||0)+Number(h.commande);
+        if(h.salon) caMapBySalon[h.salon]=(caMapBySalon[h.salon]||0)+Number(h.commande);
+      }
+    });
+    let updated=0;
+    clients.forEach(c=>{
+      // Try by ID first, then by salon name
+      const byId=caMapById[c.id]||0;
+      const bySalon=caMapBySalon[c.salon||c.nom]||0;
+      const newCA=Math.max(byId,bySalon);
+      if(newCA>0&&newCA!==c.ca26){c.ca26=newCA;updated++;}
+    });
+    if(updated>0){
+      const ts=new Date().toISOString();
+      const allData=clients.map(cl=>({
+        id:cl.id,kdnr:cl.kdnr,sek:cl.sek,nom:cl.nom,prenom:cl.prenom,
+        salon:cl.salon,rue:cl.rue,npa:cl.npa,ville:cl.ville,
+        tel1:cl.tel1,tel2:cl.tel2,
+        ca26:Number(cl.ca26)||0,ca25:Number(cl.ca25)||0,ca24:Number(cl.ca24)||0,
+        statut:cl.statut,comments:JSON.stringify(cl.comments||[]),
+        lastVisit:cl.lastVisit||'',nextVisit:cl.nextVisit||'',
+        nbVisites:cl.nbVisites||0,opport:cl.opport||'',tasks:cl.tasks||''
+      }));
+      const res=await fetch(`${FB_URL}/meta/all_clients`,{
+        method:'PATCH',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({fields:{
+          data:{stringValue:JSON.stringify(allData)},
+          count:{stringValue:String(allData.length)},
+          updated:{stringValue:ts}
+        }})
+      });
+      if(res.ok){
+        // Verify by reading back
+        const verify = await fetch(`${FB_URL}/meta/all_clients`,{headers:{'Content-Type':'application/json'}});
+        if(verify.ok){
+          const vDoc = await verify.json();
+          const vData = fromFS(vDoc);
+          if(vData && vData.data){
+            const parsed = JSON.parse(vData.data);
+            const total = parsed.reduce((s,c)=>s+Number(c.ca26||0),0);
+            console.log('Verified Firebase CA26 total after repair:', total);
+          }
+        }
+        lastUpdated=ts;
+        localStorage.setItem('crm_clients',JSON.stringify(clients));
+        rDash();rC();rCA();
+        setSyncUI('ok','CA réparé: '+updated+' clients ✓');
+        alert('CA 2026 repare ! '+updated+' clients mis a jour.');
+      } else setSyncUI('error','Erreur réparation');
+    } else {
+      setSyncUI('ok','CA déjà à jour');
+      alert('CA 2026 deja a jour - aucune commande dans l historique.');
+    }
+  }catch(e){setSyncUI('error','Erreur: '+e.message);}
+}
+
+async function syncNow(){
+  if(!isOnline){setSyncUI('error','Pas de connexion');return;}
+  await flushPending();
+  setSyncUI('syncing','Synchronisation...');
+  try{
+    const metaRes=await fetch(`${FB_URL}/meta/all_clients`,{headers:{'Content-Type':'application/json'}});
+    if(metaRes.ok){
+      const metaDoc=await metaRes.json();
+      const metaData=fromFS(metaDoc);
+      if(metaData&&metaData.data){
+        const fresh=JSON.parse(metaData.data);
+        clients=fresh.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+        localStorage.setItem('crm_clients',JSON.stringify(clients));
+      }
+    }
+    const fsV=await fsGet('visites'); visites=fsV;
+    const fsH=await fsGet('historique'); hist=fsH.sort((a,b)=>new Date(b.dateArchivage||0)-new Date(a.dateArchivage||0));
+    const fsCMD=await fsGet('commandes'); commandes=fsCMD.sort((a,b)=>new Date(b.date||0)-new Date(a.date||0));
+    setSyncUI('ok','Synchronisé '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+    rDash();rC();rV();rCA();rCMD();rH();rTasks();updateVisBadge();
+  }catch(e){setSyncUI('error','Erreur sync');}
+}
+
+// ═══════════════════════════════════════
+// SAVE FUNCTIONS
+// ═══════════════════════════════════════
+async function saveClient(c){
+  const idx=clients.findIndex(x=>x.id===c.id);
+  if(idx>=0) clients[idx]=c; else clients.push(c);
+  localStorage.setItem('crm_clients',JSON.stringify(clients));
+  if(!pendingChanges.clients) pendingChanges.clients={};
+  pendingChanges.clients[c.id]=true;
+  savePending();
+  if(isOnline){
+    try{
+      // Save only essential fields to keep size small
+      const allData=clients.map(cl=>({
+        id:cl.id, kdnr:cl.kdnr, sek:cl.sek, nom:cl.nom, prenom:cl.prenom,
+        salon:cl.salon, rue:cl.rue, npa:cl.npa, ville:cl.ville,
+        tel1:cl.tel1, tel2:cl.tel2,
+        ca26:Number(cl.ca26)||0, ca25:Number(cl.ca25)||0, ca24:Number(cl.ca24)||0,
+        statut:cl.statut, comments:JSON.stringify(cl.comments||[]),
+        lastVisit:cl.lastVisit||'', nextVisit:cl.nextVisit||'',
+        nbVisites:cl.nbVisites||0, opport:cl.opport||'', tasks:cl.tasks||''
+      }));
+      const ts = new Date().toISOString();
+      const res = await fetch(`${FB_URL}/meta/all_clients`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({fields:{
+          data:{stringValue:JSON.stringify(allData)},
+          count:{integerValue:String(allData.length)},
+          updated:{stringValue:ts}
+        }})
+      });
+      if(res.ok){
+        lastUpdated=ts;
+        delete pendingChanges.clients[c.id]; savePending();
+        setSyncUI('ok','✅ Synchronisé '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
+        // Refresh all views
+        rDash(); rC(); rCA();
+      } else {
+        const errText = await res.text();
+        console.error('Firebase save error:', res.status, errText);
+        setSyncUI('error','⚠️ Erreur Firebase '+res.status);
+      }
+    }catch(e){
+      console.error('saveClient exception:', e.message);
+      setSyncUI('error','⚠️ Réseau: '+e.message.substring(0,30));
+    }
+  } else {
+    setSyncUI('error','⚠️ Hors ligne — '+countPending()+' en attente');
+  }
+}
+
+async function saveVisite(v){
+  localStorage.setItem('crm_visites',JSON.stringify(visites));
+  if(!pendingChanges.visites) pendingChanges.visites={};
+  pendingChanges.visites[v._id||v.id]=v; savePending();
+  if(isOnline){
+    try{
+      if(v._id) await fsSet('visites',v._id,v); else{const id=await fsAdd('visites',v);if(id)v._id=id;}
+      delete pendingChanges.visites[v._id||v.id]; savePending();
+      setSyncUI('ok','Sauvegardé ✓');
+    }catch(e){setSyncUI('error','⚠️ Hors ligne');}
+  }
+}
+
+async function saveHist(h){
+  if(!pendingChanges.hist) pendingChanges.hist=[];
+  if(isOnline){
+    try{const id=await fsAdd('historique',h);if(id)h._id=id;}
+    catch(e){pendingChanges.hist.push(h);savePending();}
+  } else {pendingChanges.hist.push(h);savePending();}
+}
+
+async function saveCmd(c){
+  if(!pendingChanges.cmds) pendingChanges.cmds=[];
+  if(isOnline){
+    try{const id=await fsAdd('commandes',c);if(id)c._id=id;}
+    catch(e){pendingChanges.cmds.push(c);savePending();}
+  } else {pendingChanges.cmds.push(c);savePending();}
+}
+
+// ═══════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════
+function gp(id,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+function gSub(id,btn){
+  document.querySelectorAll('.sub-pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.stab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('sub-'+id).classList.add('on');
+  btn.classList.add('on');
+}
+function cOv(id){document.getElementById(id).classList.remove('show');}
+function openOv(id){document.getElementById(id).classList.add('show');document.getElementById(id).querySelector('.modal').scrollTop=0;}
+function updateVisBadge(){const n=visites.filter(v=>vStat(v)==='En retard').length;const b=document.getElementById('nb-vis');if(n>0){b.textContent=n;b.style.display='';}else b.style.display='none';}
+
+// ═══════════════════════════════════════
+// DASHBOARD
+// ═══════════════════════════════════════
+function rDash(){
+  const ca26t=clients.reduce((s,c)=>s+(Number(c.ca26)||0),0);
+  const ca25t=clients.reduce((s,c)=>s+(Number(c.ca25)||0),0);
+  const evol=ca25t?((ca26t-ca25t)/ca25t*100):0;
+  const actifs=clients.filter(c=>c.statut==='Actif'||c.statut==='VIP').length;
+  const vip=clients.filter(c=>c.statut==='VIP').length;
+  const planif=visites.filter(v=>vStat(v)!=='Validée').length;
+  const retard=visites.filter(v=>vStat(v)==='En retard').length;
+  const relance=clients.filter(c=>(Number(c.ca26)||0)===0&&(Number(c.ca25)||0)>0);
+  const cmdTot=commandes.reduce((s,c)=>s+(Number(c.montant)||0),0);
+
+  document.getElementById('dKpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--sage4)"><i class="ti ti-currency-franc" style="color:var(--sage)"></i></div>
+      <div><div class="kpi-val" style="color:var(--sage)">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 (CHF)</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025</div></div></div>
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--navy5)"><i class="ti ti-users" style="color:var(--navy2)"></i></div>
+      <div><div class="kpi-val" style="color:var(--navy2)">${actifs}</div><div class="kpi-lbl">Clients actifs</div><div class="kpi-sub">${vip} VIP · ${clients.length} total</div></div></div>
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--violet3)"><i class="ti ti-calendar" style="color:var(--violet2)"></i></div>
+      <div><div class="kpi-val" style="color:var(--violet2)">${planif}</div><div class="kpi-lbl">Visites planif.</div><div class="kpi-sub">${retard} en retard</div></div></div>
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--amber4)"><i class="ti ti-phone" style="color:var(--amber2)"></i></div>
+      <div><div class="kpi-val" style="color:var(--amber2)">${commandes.length}</div><div class="kpi-lbl">Cmd. téléphone</div><div class="kpi-sub">${fCHF(cmdTot)} CHF</div></div></div>`;
+
+  // URGENCE — clients à visiter (pas visités depuis > 60j ou jamais)
+  const urgence = clients.filter(c=>{
+    if(c.statut==='Inactif'||c.statut==='Perdu') return false;
+    const days = daysSince(c.lastVisit);
+    if(c.statut==='VIP') return days>30;
+    return days>60;
+  }).sort((a,b)=>daysSince(b.lastVisit)-daysSince(a.lastVisit)).slice(0,15);
+
+  document.getElementById('dUrgCt').textContent=urgence.length;
+  document.getElementById('dUrgence').innerHTML=urgence.length?urgence.map(c=>{
+    const days=daysSince(c.lastVisit);
+    const isVip=c.statut==='VIP';
+    const urgColor=days>120?'var(--crimson2)':days>90?'var(--amber2)':'var(--slate2)';
+    const urgBg=days>120?'var(--crimson4)':days>90?'var(--amber4)':'var(--slate4)';
+    return`<div class="urgence-item" onclick="openClient('${c.id}')">
+      <div class="urg-days" style="background:${urgBg}">
+        <div class="urg-n" style="color:${urgColor}">${days===9999?'∞':days}</div>
+        <div class="urg-l" style="color:${urgColor}">jours</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.salon||c.nom} ${isVip?'<span class="pill p-a" style="font-size:9px">VIP</span>':''}</div>
+        <div style="font-size:10px;color:var(--slate2)">${c.ville} · ${c.tel1||'—'}</div>
+        ${c.nextVisit?`<div style="font-size:10px;color:var(--sage)">📅 Planifiée: ${fmt(c.nextVisit)}</div>`:''}
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--navy2);font-family:'JetBrains Mono',monospace">${fCHF(c.ca25)}</div>
+    </div>`;
+  }).join(''):'<div class="empty"><i class="ti ti-check"></i><p>Tous vos clients ont été visités récemment !</p></div>';
+
+  // TOP 10
+  const top10=clients.filter(c=>(Number(c.ca26)||0)>0).sort((a,b)=>b.ca26-a.ca26).slice(0,10);
+  document.getElementById('dTop10').innerHTML=top10.length?`<table class="tbl"><tbody>${top10.map((c,i)=>{
+    const diff=(Number(c.ca26)||0)-(Number(c.ca25)||0);
+    return`<tr onclick="openClient('${c.id}')">
+      <td><div style="width:20px;height:20px;border-radius:50%;background:var(--navy4);color:var(--navy2);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700">${i+1}</div></td>
+      <td class="c-salon">${c.salon||c.nom}</td><td class="c-ville">${c.ville}</td>
+      <td class="c-ca" style="color:var(--sage)">${fCHF(c.ca26)}</td>
+      <td class="c-ca" style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)}</td></tr>`;
+  }).join('')}</tbody></table>`:
+  '<div class="empty"><i class="ti ti-trophy"></i><p>Aucune commande 2026</p></div>';
+
+  // VILLES
+  const villes={};clients.forEach(c=>{if(c.ca26>0)villes[c.ville]=(villes[c.ville]||0)+Number(c.ca26);});
+  const topV=Object.entries(villes).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxV=topV[0]?topV[0][1]:1;
+  document.getElementById('dVilles').innerHTML=topV.length?topV.map(([vil,ca])=>`
+    <div class="bar-row"><div class="bar-lbl">${vil}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(ca/maxV*100)}%;background:var(--sage)">
+        <span class="bar-val">${Math.round(ca/1000)}k</span></div></div></div>`).join(''):
+    '<div style="padding:10px 14px;color:var(--slate2);font-size:12px">Aucune donnée</div>';
+
+  // RELANCE
+  document.getElementById('dRelCt').textContent=relance.length;
+  document.getElementById('dRelance').innerHTML=relance.sort((a,b)=>(b.ca25||0)-(a.ca25||0)).slice(0,10).map(c=>`
+    <div class="urgence-item" onclick="openClient('${c.id}')">
+      <div class="c-av" style="background:var(--slate3);color:var(--slate2);width:32px;height:32px">${ini(c.salon||c.nom)}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.salon||c.nom}</div>
+        <div style="font-size:10px;color:var(--slate2)">${c.ville} · ${c.tel1||'—'}</div></div>
+      <div style="font-size:11px;font-weight:700;color:var(--amber);font-family:'JetBrains Mono',monospace">${fCHF(c.ca25)} CHF</div>
+    </div>`).join('')||'<div class="empty"><i class="ti ti-check"></i><p>Aucun client à relancer</p></div>';
+}
+
+// ═══════════════════════════════════════
+// CLIENTS TABLE
+// ═══════════════════════════════════════
+function fC(){
+  const q=(document.getElementById('sC').value||'').toLowerCase();
+  const st=document.getElementById('fSt').value;
+  const sek=document.getElementById('fSek').value;
+  return clients.filter(c=>{
+    const mQ=!q||[c.salon,c.nom,c.prenom,c.ville,c.kdnr].some(v=>(v||'').toLowerCase().includes(q));
+    return mQ&&(!st||c.statut===st)&&(!sek||c.sek===sek);
+  });
+}
+function cPg(d){const fc=fC();const t=Math.ceil(fc.length/PER)||1;cpg=Math.max(1,Math.min(t,cpg+d));rC();}
+
+function rC(){
+  const fc=fC();
+  document.getElementById('cCount').textContent=`${fc.length} client${fc.length>1?'s':''}`;
+  document.getElementById('cPi').textContent=`${cpg}/${Math.ceil(fc.length/PER)||1}`;
+  const page=fc.slice((cpg-1)*PER,cpg*PER);
+  document.getElementById('cTbody').innerHTML=page.map(c=>{
+    const diff=(Number(c.ca26)||0)-(Number(c.ca25)||0);
+    const days=daysSince(c.lastVisit);
+    const rowCl=c.nextVisit?'hl-g':c.statut==='VIP'?'hl-a':((Number(c.ca26)===0&&Number(c.ca25)>0)?'hl-r':'');
+    return`<tr class="${rowCl}" onclick="openClient('${c.id}')">
+      <td><div class="c-av" style="background:${avBg(c.statut)};color:${avFg(c.statut)}">${ini(c.salon||c.nom)}</div></td>
+      <td><div class="c-salon">${c.salon||c.nom}</div>${c.nextVisit?`<div style="font-size:9px;color:var(--sage)">📅 ${fmt(c.nextVisit)}</div>`:''}</td>
+      <td class="c-ville">${c.ville||'—'}</td>
+      <td style="color:var(--slate2);font-size:11px">${c.tel1||'—'}</td>
+      <td class="c-ca" style="color:${Number(c.ca26)>0?'var(--sage)':'var(--slate2)'}">${fCHF(c.ca26)}</td>
+      <td class="c-ca" style="color:var(--navy2)">${fCHF(c.ca25)}</td>
+      <td class="c-ca" style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)}</td>
+      <td><span class="pill ${pCl(c.statut)}">${c.statut}</span></td>
+      <td style="font-size:10px;color:var(--slate2)">${fmt(c.nextVisit)||'—'}</td>
+      <td style="font-size:10px;color:${days>60?'var(--crimson2)':days>30?'var(--amber2)':'var(--slate2)'}">${c.lastVisit?fmt(c.lastVisit)+' ('+days+'j)':'Jamais'}</td>
+    </tr>`;
+  }).join('')||`<tr><td colspan="10"><div class="empty"><i class="ti ti-search"></i><p>Aucun client trouvé</p></div></td></tr>`;
+}
+
+// ═══════════════════════════════════════
+// CLIENT DETAIL
+// ═══════════════════════════════════════
+function openClient(id){
+  currentClientId=id;
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  gSub('info',document.querySelector('.stab'));
+  document.getElementById('cmTitle').textContent=c.salon||c.nom;
+  document.getElementById('cmId').value=c.id;
+  document.getElementById('cmIco').style.background=avBg(c.statut);
+  document.getElementById('di-kd').textContent=c.kdnr||'—';
+  document.getElementById('di-sek').textContent='Secteur '+c.sek;
+  document.getElementById('di-salon').textContent=c.salon||c.nom;
+  document.getElementById('di-nom').textContent=(c.nom||'')+(c.prenom?' '+c.prenom:'');
+  document.getElementById('di-ville').textContent=(c.npa||'')+(c.npa?' ':'')+c.ville||'—';
+  document.getElementById('di-t1').textContent=c.tel1||'—';
+  document.getElementById('di-t2').textContent=c.tel2||'—';
+  document.getElementById('di-rue').textContent=c.rue||'—';
+  document.getElementById('di-statut').innerHTML=`<span class="pill ${pCl(c.statut)}">${c.statut}</span>`;
+  document.getElementById('di-lv').textContent=c.lastVisit?fmt(c.lastVisit)+' ('+daysSince(c.lastVisit)+' jours)':'Jamais';
+  document.getElementById('di-nv').textContent=fmt(c.nextVisit)||'—';
+  document.getElementById('di-nbv').textContent=(c.nbVisites||0)+' visite(s)';
+  const tw=document.getElementById('di-tasks-wrap');
+  const ow=document.getElementById('di-opp-wrap');
+  if(c.tasks){tw.style.display='block';document.getElementById('di-tasks').textContent=c.tasks;}else tw.style.display='none';
+  if(c.opport){ow.style.display='block';document.getElementById('di-opp').textContent=c.opport;}else ow.style.display='none';
+  const diff=(Number(c.ca26)||0)-(Number(c.ca25)||0);
+  document.getElementById('di-ca24').textContent=fCHF(c.ca24)+' CHF';
+  document.getElementById('di-ca25').textContent=fCHF(c.ca25)+' CHF';
+  document.getElementById('di-ca26').textContent=fCHF(c.ca26)+' CHF';
+  document.getElementById('di-evol').innerHTML=`<span style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)} CHF</span>`;
+  document.getElementById('di-cmd').value='';
+  refreshComments(c);
+  document.getElementById('ed-kd').value=c.kdnr||'';
+  document.getElementById('ed-sek').value=c.sek||'102';
+  document.getElementById('ed-nom').value=c.nom||'';
+  document.getElementById('ed-pr').value=c.prenom||'';
+  document.getElementById('ed-sal').value=c.salon||'';
+  document.getElementById('ed-rue').value=c.rue||'';
+  document.getElementById('ed-npa').value=c.npa||'';
+  document.getElementById('ed-vil').value=c.ville||'';
+  document.getElementById('ed-t1').value=c.tel1||'';
+  document.getElementById('ed-t2').value=c.tel2||'';
+  document.getElementById('ed-st').value=c.statut||'Actif';
+  document.getElementById('ed-opp').value=c.opport||'';
+  document.getElementById('ed-tasks').value=c.tasks||'';
+  const nextD=new Date();nextD.setDate(nextD.getDate()+30);
+  document.getElementById('di-vdate').value=c.nextVisit||nextD.toISOString().slice(0,10);
+  document.getElementById('di-vheure').value='';
+  document.getElementById('di-vobjet').value='';
+  document.getElementById('di-vprio').value='';
+  document.getElementById('di-vcr').value='';
+  document.getElementById('di-vcmd').value='';
+  document.getElementById('di-vopp').value='';
+  openOv('ovClient');
+}
+
+function openCM(id){
+  if(id){openClient(id);return;}
+  const c={id:uid(),kdnr:'',sek:'102',nom:'',prenom:'',salon:'',rue:'',npa:'',ville:'',tel1:'',tel2:'',ca26:0,ca25:0,ca24:0,statut:'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''};
+  clients.push(c); openClient(c.id);
+  gSub('edit',document.querySelectorAll('.stab')[4]);
+}
+
+function refreshComments(c){
+  const coms=c.comments||[];
+  document.getElementById('di-comlist').innerHTML=coms.length?
+    coms.slice().reverse().map(cm=>`<div class="com-item"><div class="com-date">${fmt(cm.date)} ${cm.time||''}</div><div class="com-text">${cm.text}</div></div>`).join(''):
+    '<div style="padding:10px 0;color:var(--slate2);font-size:12px;text-align:center">Aucune note</div>';
+}
+
+async function addComment(){
+  const id=document.getElementById('cmId').value;
+  const txt=document.getElementById('di-newcom').value.trim();
+  if(!txt)return;
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  if(!c.comments)c.comments=[];
+  c.comments.push({date:td(),time:new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}),text:txt});
+  document.getElementById('di-newcom').value='';
+  refreshComments(c);
+  await saveClient(c); rC(); rDash();
+}
+
+async function addCommande(){
+  if(isReadOnly) return;
+  const id=document.getElementById('cmId').value;
+  const mt=Number(document.getElementById('di-cmd').value)||0;
+  if(mt<=0){alert('Montant invalide');return;}
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  c.ca26=(Number(c.ca26)||0)+mt;
+  document.getElementById('di-cmd').value='';
+  const diff=(Number(c.ca26)||0)-(Number(c.ca25)||0);
+  document.getElementById('di-ca26').textContent=fCHF(c.ca26)+' CHF';
+  document.getElementById('di-evol').innerHTML=`<span style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)} CHF</span>`;
+  const h={id:uid(),dateArchivage:td(),clientId:c.id,salon:c.salon||c.nom,nom:c.nom,ville:c.ville,date:td(),objet:'Commande directe',commande:mt};
+  hist.unshift(h); await saveHist(h);
+  await saveClient(c); rC(); rDash(); rCA();
+}
+
+async function saveEdit(){
+  if(isReadOnly) return;
+  const id=document.getElementById('cmId').value;
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  Object.assign(c,{kdnr:document.getElementById('ed-kd').value,sek:document.getElementById('ed-sek').value,nom:document.getElementById('ed-nom').value,prenom:document.getElementById('ed-pr').value,salon:document.getElementById('ed-sal').value,rue:document.getElementById('ed-rue').value,npa:document.getElementById('ed-npa').value,ville:document.getElementById('ed-vil').value,tel1:document.getElementById('ed-t1').value,tel2:document.getElementById('ed-t2').value,statut:document.getElementById('ed-st').value,opport:document.getElementById('ed-opp').value,tasks:document.getElementById('ed-tasks').value});
+  await saveClient(c); openClient(id); rC(); rDash();
+}
+
+async function planifierVisite(){
+  if(isReadOnly) return;
+  const id=document.getElementById('cmId').value;
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  const date=document.getElementById('di-vdate').value;
+  if(!date){alert('Date requise');return;}
+  c.nextVisit=date;
+  const v={id:uid(),clientId:c.id,salon:c.salon||c.nom,nom:c.nom,prenom:c.prenom,ville:c.ville,date,heure:document.getElementById('di-vheure').value,objet:document.getElementById('di-vobjet').value,priorite:document.getElementById('di-vprio').value,statut:'Planifiée',comment:'',commande:0,opport:''};
+  visites.push(v);
+  await saveClient(c); await saveVisite(v);
+  rC(); rV(); rDash(); updateVisBadge();
+  document.getElementById('di-nv').textContent=fmt(date);
+  // ICS export
+  if(confirm('✅ Visite planifiée le '+fmt(date)+'!\n\nAjouter à votre agenda ? (Rappels: 1h et 15min avant)')) exportToCalendar(v,c);
+}
+
+async function validerVisite(){
+  if(isReadOnly) return;
+  const id=document.getElementById('cmId').value;
+  const c=clients.find(x=>x.id===id); if(!c)return;
+  const cr=document.getElementById('di-vcr').value;
+  const cmd=Number(document.getElementById('di-vcmd').value)||0;
+  const opp=document.getElementById('di-vopp').value;
+  const dateV=td();
+  c.lastVisit=dateV; c.nextVisit=''; c.nbVisites=(c.nbVisites||0)+1;
+  if(cr){if(!c.comments)c.comments=[];c.comments.push({date:dateV,time:new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}),text:'[Visite validée] '+cr});}
+  if(cmd>0) c.ca26=(Number(c.ca26)||0)+cmd;
+  if(opp) c.opport=opp;
+  const vIdx=visites.findIndex(v=>v.clientId===id&&v.statut!=='Validée');
+  if(vIdx>=0){visites[vIdx].statut='Validée';visites[vIdx].comment=cr;visites[vIdx].commande=cmd;await saveVisite(visites[vIdx]);}
+  const h={id:uid(),dateArchivage:dateV,clientId:id,salon:c.salon||c.nom,nom:c.nom,ville:c.ville,date:dateV,objet:'Visite validée',comment:cr,commande:cmd,opport:opp};
+  hist.unshift(h); await saveHist(h);
+  await saveClient(c);
+  refreshComments(c);
+  document.getElementById('di-ca26').textContent=fCHF(c.ca26)+' CHF';
+  rC(); rV(); rDash(); rH(); updateVisBadge();
+  alert('✅ Visite validée !'+(cmd>0?'\nCommande : '+fCHF(cmd)+' CHF → CA 2026':''));
+}
+
+// ICS EXPORT
+function exportToCalendar(v,c){
+  const start=v.date?v.date.replace(/-/g,''):'';
+  const heure=v.heure?v.heure.replace(':',''):'0900';
+  const endH=v.heure?String(Number(v.heure.split(':')[0])+1).padStart(2,'0')+v.heure.split(':')[1]:'1000';
+  const salon=(c?c.salon||c.nom:v.salon)||'Client';
+  const adresse=c?(c.rue||'')+(c.npa?' '+c.npa:'')+(c.ville?' '+c.ville:''):(v.ville||'');
+  const ics=['BEGIN:VCALENDAR','VERSION:2.0','BEGIN:VEVENT',
+    'DTSTART:'+start+'T'+heure+'00','DTEND:'+start+'T'+endH+'00',
+    'SUMMARY:✂ '+salon,'LOCATION:'+adresse.trim(),
+    'DESCRIPTION:'+(v.objet||'Visite commerciale'),
+    'BEGIN:VALARM','TRIGGER:-PT60M','ACTION:DISPLAY','DESCRIPTION:Rappel: '+salon,'END:VALARM',
+    'BEGIN:VALARM','TRIGGER:-PT15M','ACTION:DISPLAY','DESCRIPTION:Dans 15min: '+salon,'END:VALARM',
+    'END:VEVENT','END:VCALENDAR'].join('\r\n');
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='visite-'+salon.replace(/\s+/g,'-').toLowerCase()+'.ics';a.click();URL.revokeObjectURL(url);
+}
+
+// ═══════════════════════════════════════
+// VISITES
+// ═══════════════════════════════════════
+function rV(){
+  const q=(document.getElementById('sV').value||'').toLowerCase();
+  const st=document.getElementById('fVS').value;
+  const vs=visites.filter(v=>{
+    const s=vStat(v);
+    const mQ=!q||[v.salon,v.nom,v.ville,v.objet,v.comment].some(x=>(x||'').toLowerCase().includes(q));
+    return mQ&&(!st||s===st);
+  }).sort((a,b)=>{
+    if(a.statut==='Validée'&&b.statut!=='Validée')return 1;
+    if(b.statut==='Validée'&&a.statut!=='Validée')return-1;
+    return new Date(a.date)-new Date(b.date);
+  });
+  const SC={'Validée':'var(--sage)','En retard':'var(--crimson2)','Aujourdhui':'var(--amber2)','Planifiée':'var(--navy3)'};
+  const PC={'Validée':'p-g','En retard':'p-r','Aujourdhui':'p-a','Planifiée':'p-n'};
+  document.getElementById('vCards').innerHTML=vs.map(v=>{
+    const s=vStat(v);
+    return`<div class="v-card"><div class="v-stripe" style="background:${SC[s]||'var(--navy3)'}"></div>
+      <div class="v-body">
+        <div class="v-top"><span class="v-salon">${v.salon||'—'}</span><span class="pill ${PC[s]||'p-n'}">${s}</span>
+          ${v.priorite==='Haute'?'<span class="pill p-r">Haute</span>':''}
+          ${v.objet?`<span class="pill p-gy" style="font-size:9px">${v.objet}</span>`:''}</div>
+        <div class="v-meta">${v.nom||''} ${v.prenom||''} ${v.ville?'· '+v.ville:''} ${v.heure?'· '+v.heure:''} ${v.date?'· '+fmt(v.date):''}</div>
+        ${v.comment?`<div class="v-com">${v.comment}</div>`:''}
+        ${v.commande&&Number(v.commande)>0?`<div style="font-size:11px;color:var(--sage);font-weight:600;margin-top:3px">💰 ${fCHF(v.commande)} CHF → CA 2026</div>`:''}
+        <div class="v-actions">
+          <button class="btn btn-sm" onclick="openVM('${v._id||v.id}')"><i class="ti ti-edit"></i> Modifier</button>
+          ${s!=='Validée'?`<button class="btn btn-success btn-sm" onclick="doVal('${v._id||v.id}')"><i class="ti ti-circle-check"></i> Valider</button>`:''}
+          ${v.date&&s!=='Validée'?`<button class="btn btn-sm" style="color:var(--violet2)" onclick="exportToCalendar(visites.find(x=>(x._id||x.id)==='${v._id||v.id}'),clients.find(x=>x.id===(visites.find(y=>(y._id||y.id)==='${v._id||v.id}')||{}).clientId))"><i class="ti ti-calendar-plus"></i> Agenda</button>`:''}
+          <button class="btn btn-sm" style="color:var(--crimson2)" onclick="delV('${v._id||v.id}')"><i class="ti ti-trash"></i></button>
+        </div>
+      </div></div>`;
+  }).join('')||'<div class="empty"><i class="ti ti-calendar-off"></i><p>Aucune visite</p></div>';
+}
+
+function openVM(id){
+  document.getElementById('vmSug').style.display='none';
+  document.getElementById('vmPrev').classList.remove('show');
+  if(id){
+    const v=visites.find(x=>(x._id||x.id)===id); if(!v)return;
+    document.getElementById('vmTitle').textContent='Modifier la visite';
+    document.getElementById('vmId').value=v._id||v.id;
+    document.getElementById('vmSrch').value=v.salon||v.nom||'';
+    document.getElementById('vmCid').value=v.clientId||'';
+    document.getElementById('vmD').value=v.date||'';
+    document.getElementById('vmH').value=v.heure||'';
+    document.getElementById('vmOb').value=v.objet||'';
+    document.getElementById('vmCom').value=v.comment||'';
+    document.getElementById('vmCmd').value=v.commande||'';
+    document.getElementById('vmPr').value=v.priorite||'';
+    document.getElementById('vmOp').value=v.opport||'';
+    document.getElementById('vmSt').value=v.statut||'Planifiée';
+    document.getElementById('vmValBtn').style.display=v.statut!=='Validée'?'inline-flex':'none';
+    if(v.clientId) showPrev(v.clientId,'vmPrev','vmSrch');
+  } else {
+    document.getElementById('vmTitle').textContent='Nouvelle visite';
+    ['vmId','vmSrch','vmCid','vmD','vmH','vmCom','vmCmd','vmOp'].forEach(e=>document.getElementById(e).value='');
+    document.getElementById('vmOb').value=''; document.getElementById('vmPr').value='';
+    document.getElementById('vmSt').value='Planifiée'; document.getElementById('vmValBtn').style.display='none';
+  }
+  openOv('ovVisite');
+}
+
+function srchC(q){
+  srchGeneric(q,'vmSug','vmCid','vmSrch','vmPrev');
+}
+
+function srchCCmd(q){
+  srchGeneric(q,'cmdSug','cmdCid','cmdSrch','cmdPrev');
+}
+
+function srchGeneric(q,sugId,cidId,srchId,prevId){
+  const b=document.getElementById(sugId);
+  if(!q||q.length<2){b.style.display='none';return;}
+  const r=clients.filter(c=>[c.salon,c.nom,c.kdnr].some(v=>(v||'').toLowerCase().includes(q.toLowerCase()))).slice(0,6);
+  if(!r.length){b.style.display='none';return;}
+  b.innerHTML=r.map(c=>`<div class="sug-item" onclick="selCGeneric(clients.find(x=>x.id==='${c.id}'),'${sugId}','${cidId}','${srchId}','${prevId}')">
+    <div style="font-weight:600">${c.salon||c.nom}</div>
+    <div style="font-size:10px;color:var(--slate2)">${c.nom} ${c.prenom||''} · ${c.ville}</div></div>`).join('');
+  b.style.display='block';
+}
+
+function selCGeneric(c,sugId,cidId,srchId,prevId){
+  if(!c)return;
+  document.getElementById(srchId).value=c.salon||c.nom;
+  document.getElementById(cidId).value=c.id;
+  document.getElementById(sugId).style.display='none';
+  showPrev(c.id,prevId,srchId);
+}
+
+function showPrev(cid,prevId,srchId){
+  const c=clients.find(x=>x.id===cid); if(!c)return;
+  const prev=document.getElementById(prevId);
+  prev.style.display='flex'; prev.classList.add('show');
+  const lc=c.comments&&c.comments.length?c.comments[c.comments.length-1]:null;
+  prev.innerHTML=`<div style="display:flex;align-items:center;gap:8px">
+    <div class="c-av" style="background:${avBg(c.statut)};color:${avFg(c.statut)};width:30px;height:30px">${ini(c.salon||c.nom)}</div>
+    <div><div style="font-size:13px;font-weight:700">${c.salon||c.nom} <span class="pill ${pCl(c.statut)}">${c.statut}</span></div>
+    <div style="font-size:11px;color:var(--slate2)">${c.ville} · ${c.tel1||'—'}</div></div></div>
+  <div style="font-size:11px;color:var(--slate2);display:flex;align-items:center;gap:4px"><i class="ti ti-chart-bar" style="font-size:12px"></i>CA 2026: <strong style="color:var(--sage)">${fCHF(c.ca26)} CHF</strong> · 2025: ${fCHF(c.ca25)} CHF</div>
+  ${lc?`<div style="font-size:11px;color:var(--navy2);display:flex;align-items:center;gap:4px"><i class="ti ti-message-2" style="font-size:12px"></i>${lc.text.substring(0,80)}</div>`:''}`;
+}
+
+async function svV(){
+  if(isReadOnly) return;
+  const id=document.getElementById('vmId').value;
+  const cid=document.getElementById('vmCid').value;
+  const c=cid?clients.find(x=>x.id===cid):null;
+  let v=id?visites.find(x=>(x._id||x.id)===id):null;
+  if(!v){v={id:uid()};visites.push(v);}
+  const com=document.getElementById('vmCom').value;
+  const cmd=Number(document.getElementById('vmCmd').value)||0;
+  Object.assign(v,{clientId:cid,salon:c?c.salon||c.nom:document.getElementById('vmSrch').value,nom:c?c.nom:'',prenom:c?c.prenom:'',ville:c?c.ville:'',date:document.getElementById('vmD').value,heure:document.getElementById('vmH').value,objet:document.getElementById('vmOb').value,comment:com,commande:cmd,priorite:document.getElementById('vmPr').value,opport:document.getElementById('vmOp').value,statut:document.getElementById('vmSt').value});
+  if(v.date&&c){c.nextVisit=v.date;await saveClient(c);}
+  await saveVisite(v); cOv('ovVisite'); rV(); rC(); rDash(); updateVisBadge();
+}
+
+async function doVal(vid){
+  if(isReadOnly) return;
+  const id=vid||document.getElementById('vmId').value;
+  const v=visites.find(x=>(x._id||x.id)===id); if(!v)return;
+  v.statut='Validée'; v.dateVal=td();
+  const c=v.clientId?clients.find(x=>x.id===v.clientId):null;
+  if(c){
+    c.lastVisit=v.date; c.nbVisites=(c.nbVisites||0)+1; c.nextVisit='';
+    if(v.comment){if(!c.comments)c.comments=[];c.comments.push({date:td(),time:new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}),text:'[Visite validée '+fmt(v.date)+']: '+v.comment});}
+    if(v.commande&&Number(v.commande)>0) c.ca26=(Number(c.ca26)||0)+Number(v.commande);
+    await saveClient(c);
+    const h={id:uid(),dateArchivage:td(),clientId:v.clientId,salon:v.salon,nom:v.nom,ville:v.ville,date:v.date,objet:v.objet,comment:v.comment,commande:v.commande,opport:v.opport};
+    hist.unshift(h); await saveHist(h);
+  }
+  await saveVisite(v);
+  if(!vid)cOv('ovVisite');
+  rV(); rC(); rDash(); rH(); updateVisBadge();
+}
+
+async function delV(id){
+  if(isReadOnly) return;
+  if(!confirm('Supprimer cette visite ?'))return;
+  const v=visites.find(x=>(x._id||x.id)===id);
+  if(v&&v._id) await fsDel('visites',v._id);
+  visites=visites.filter(x=>(x._id||x.id)!==id);
+  rV(); rDash(); updateVisBadge();
+}
+
+// ═══════════════════════════════════════
+// CA 2026
+// ═══════════════════════════════════════
+function rCA(){
+  const q=(document.getElementById('sCA').value||'').toLowerCase();
+  const f=document.getElementById('fCA').value;
+  const ca26t=clients.reduce((s,c)=>s+(Number(c.ca26)||0),0);
+  const ca25t=clients.reduce((s,c)=>s+(Number(c.ca25)||0),0);
+  const evol=ca25t?((ca26t-ca25t)/ca25t*100):0;
+  const a26=clients.filter(c=>(Number(c.ca26)||0)>0).length;
+  document.getElementById('caKpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--sage4)"><i class="ti ti-currency-franc" style="color:var(--sage)"></i></div>
+      <div><div class="kpi-val" style="color:var(--sage);font-size:16px">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 total</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025</div></div></div>
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--navy5)"><i class="ti ti-users" style="color:var(--navy2)"></i></div>
+      <div><div class="kpi-val" style="color:var(--navy2)">${a26}</div><div class="kpi-lbl">Clients 2026</div><div class="kpi-sub">sur ${clients.length} total</div></div></div>`;
+  let list=clients.filter(c=>{
+    const mQ=!q||[c.salon,c.nom,c.ville,c.kdnr].some(v=>(v||'').toLowerCase().includes(q));
+    if(!mQ)return false;
+    if(f==='active')return(Number(c.ca26)||0)>0;
+    if(f==='zero')return(Number(c.ca26)||0)===0&&(Number(c.ca25)||0)>0;
+    return true;
+  }).sort((a,b)=>(Number(b.ca26)||0)-(Number(a.ca26)||0));
+  document.getElementById('caList').innerHTML=list.slice(0,150).map(c=>{
+    const ca26=Number(c.ca26)||0,ca25=Number(c.ca25)||0,diff=ca26-ca25,obj=Math.round(ca25*1.1);
+    const hlCl=ca26>0&&ca26>=ca25?'hl-g':ca26===0&&ca25>0?'hl-r':'';
+    return`<div class="ca-tbl-row ${hlCl}" onclick="openClient('${c.id}')">
+      <div class="c-av" style="background:${avBg(c.statut)};color:${avFg(c.statut)};width:28px;height:28px;font-size:9px">${ini(c.salon||c.nom)}</div>
+      <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.salon||c.nom}</div><div style="font-size:10px;color:var(--slate2)">${c.ville} · Sek ${c.sek}</div></div>
+      <div class="ca-nums">
+        <div class="ca-num-col"><div class="ca-num" style="color:${ca26>0?'var(--sage)':'var(--slate2)'}">${fCHF(ca26)}</div><div class="ca-num-lbl">2026</div></div>
+        <div class="ca-num-col"><div class="ca-num" style="color:var(--navy2)">${fCHF(ca25)}</div><div class="ca-num-lbl">2025</div></div>
+        <div class="ca-num-col"><div class="ca-num" style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)}</div><div class="ca-num-lbl">Évol.</div></div>
+        <div class="ca-num-col"><div class="ca-num" style="color:var(--amber)">${fCHF(obj)}</div><div class="ca-num-lbl">Obj.+10%</div></div>
+      </div></div>`;
+  }).join('')||'<div class="empty"><i class="ti ti-chart-bar"></i><p>Aucun résultat</p></div>';
+}
+
+// ═══════════════════════════════════════
+// COMMANDES TELEPHONE
+// ═══════════════════════════════════════
+function rCMD(){
+  const q=(document.getElementById('sCMD').value||'').toLowerCase();
+  const list=commandes.filter(c=>!q||[c.salon,c.nom,c.ville,c.description,c.notes].some(x=>(x||'').toLowerCase().includes(q)));
+  const tot=commandes.reduce((s,c)=>s+(Number(c.montant)||0),0);
+  const totM=commandes.filter(c=>c.date&&c.date.startsWith(td().slice(0,7))).reduce((s,c)=>s+(Number(c.montant)||0),0);
+  document.getElementById('cmdKpis').innerHTML=`
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--amber4)"><i class="ti ti-phone" style="color:var(--amber2)"></i></div>
+      <div><div class="kpi-val" style="color:var(--amber2)">${commandes.length}</div><div class="kpi-lbl">Commandes tél.</div><div class="kpi-sub">${fCHF(tot)} CHF total</div></div></div>
+    <div class="kpi-card"><div class="kpi-ico" style="background:var(--sage4)"><i class="ti ti-currency-franc" style="color:var(--sage)"></i></div>
+      <div><div class="kpi-val" style="color:var(--sage);font-size:16px">${fCHF(totM)}</div><div class="kpi-lbl">CA tél. ce mois</div><div class="kpi-sub">${new Date().toLocaleString('fr-CH',{month:'long',year:'numeric'})}</div></div></div>`;
+  document.getElementById('cmdList').innerHTML=list.length?list.map(c=>`
+    <div class="cmd-item">
+      <div class="cmd-head">
+        <div><div class="cmd-salon">${c.salon||'—'}</div><div class="cmd-meta">${fmt(c.date)} · ${c.ville||''} · ${c.tel||''}</div></div>
+        <div style="text-align:right"><div class="cmd-mt">${fCHF(c.montant)} CHF</div><span class="pill ${c.resultat==='Commande passée'?'p-g':c.resultat==='Pas intéressé'?'p-r':'p-gy'}">${c.resultat||'—'}</span></div>
+      </div>
+      ${c.description?`<div class="cmd-note">📦 ${c.description}</div>`:''}
+      ${c.notes?`<div class="cmd-note" style="border-left-color:var(--violet2)">💬 ${c.notes}</div>`:''}
+      ${c.duree?`<div style="font-size:10px;color:var(--slate2);margin-top:3px">⏱ ${c.duree} min</div>`:''}
+    </div>`).join(''):
+    '<div class="empty"><i class="ti ti-phone-off"></i><p>Aucune commande téléphone</p></div>';
+}
+
+function openCmdM(id){
+  if(isReadOnly) return;
+  document.getElementById('cmdSug').style.display='none';
+  document.getElementById('cmdPrev').classList.remove('show');
+  document.getElementById('cmdTitle').textContent='Nouvelle commande téléphone';
+  ['cmdId','cmdSrch','cmdCid','cmdMt','cmdDesc','cmdDur','cmdNote'].forEach(e=>document.getElementById(e).value='');
+  document.getElementById('cmdDate').value=td();
+  document.getElementById('cmdRes').value='';
+  openOv('ovCmd');
+}
+
+async function svCmd(){
+  if(isReadOnly) return;
+  const cid=document.getElementById('cmdCid').value;
+  const c=cid?clients.find(x=>x.id===cid):null;
+  const mt=Number(document.getElementById('cmdMt').value)||0;
+  const cmd={
+    id:uid(),clientId:cid,
+    salon:c?c.salon||c.nom:document.getElementById('cmdSrch').value,
+    nom:c?c.nom:'',ville:c?c.ville:'',tel:c?c.tel1:'',
+    montant:mt,date:document.getElementById('cmdDate').value,
+    description:document.getElementById('cmdDesc').value,
+    duree:document.getElementById('cmdDur').value,
+    resultat:document.getElementById('cmdRes').value,
+    notes:document.getElementById('cmdNote').value,
+    dateArchivage:td()
+  };
+  commandes.unshift(cmd);
+  // Add to CA 2026 if commande passée
+  if(c&&mt>0&&cmd.resultat==='Commande passée'){
+    c.ca26=(Number(c.ca26)||0)+mt;
+    if(!c.comments)c.comments=[];
+    c.comments.push({date:td(),time:new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}),text:'[Commande tél. '+fCHF(mt)+' CHF] '+(cmd.description||'')});
+    await saveClient(c);
+  }
+  await saveCmd(cmd);
+  cOv('ovCmd'); rCMD(); rDash(); rCA();
+  if(mt>0&&cmd.resultat==='Commande passée') alert('✅ Commande enregistrée !\n'+fCHF(mt)+' CHF ajouté au CA 2026 de '+cmd.salon);
+}
+
+// ═══════════════════════════════════════
+// HISTORIQUE
+// ═══════════════════════════════════════
+function rH(){
+  const q=(document.getElementById('sH').value||'').toLowerCase();
+  const h=hist.filter(h=>!q||[h.salon,h.nom,h.ville,h.objet,h.comment].some(x=>(x||'').toLowerCase().includes(q)));
+  document.getElementById('hList').innerHTML=h.map(h=>{
+    const d=h.date?new Date(h.date):null;
+    return`<div class="h-row">
+      <div class="h-date">${d?`<div class="h-day">${d.getDate()}</div><div class="h-mon">${d.toLocaleString('fr-CH',{month:'short'})}</div>`:'—'}</div>
+      <div class="h-line"></div>
+      <div class="h-info">
+        <div style="font-size:12px;font-weight:600">${h.salon||'—'} <span style="font-size:10px;color:var(--slate2);font-weight:400">· ${h.ville||''}</span></div>
+        <div style="font-size:10px;color:var(--slate2);margin-top:1px">${h.objet||''} ${h.commande&&Number(h.commande)>0?'· <strong style="color:var(--sage)">'+fCHF(h.commande)+' CHF</strong>':''}</div>
+        ${h.comment?`<div style="font-size:11px;color:var(--slate);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">💬 ${h.comment}</div>`:''}
+      </div>
+      <div style="font-size:9px;color:var(--slate2);flex-shrink:0">${fmt(h.dateArchivage)}</div>
+    </div>`;
+  }).join('')||'<div class="empty"><i class="ti ti-history"></i><p>Les visites validées apparaissent ici</p></div>';
+}
+
+function openMaps(app) {
+  const id = document.getElementById('cmId').value;
+  const c = clients.find(x => x.id === id);
+  if(!c) return;
+  
+  const addr = [c.rue, c.npa, c.ville].filter(Boolean).join(' ');
+  const salon = c.salon || c.nom || '';
+  const query = encodeURIComponent(salon + ' ' + addr);
+  const addrEnc = encodeURIComponent(addr);
+  
+  if(!addr.trim()) {
+    alert('Adresse non disponible pour ce client.');
+    return;
+  }
+  
+  let url = '';
+  if(app === 'google') {
+    url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  } else if(app === 'waze') {
+    url = `https://waze.com/ul?q=${addrEnc}&navigate=yes`;
+  } else if(app === 'apple') {
+    url = `https://maps.apple.com/?q=${query}&address=${addrEnc}`;
+  }
+  
+  window.open(url, '_blank');
+}
+
+
+// ═══════════════════════════════════════
+// TACHES
+// ═══════════════════════════════════════
+function rTasks(){
+  const taskList = tasks.filter(t=>!t.done);
+  const ct = document.getElementById('dTaskCt');
+  if(ct) ct.textContent = taskList.length;
+  const doneList = tasks.filter(t=>t.done);
+  const typeIcon = {tache:'📋',retour:'📦',rappel:'📞',autre:'⭐'};
+  const prioColor = {haute:'var(--crimson2)',normal:'var(--navy2)',basse:'var(--sage)'};
+  
+  document.getElementById('dTasks').innerHTML = taskList.length ? 
+    taskList.sort((a,b)=>{
+      if(a.priorite==='haute'&&b.priorite!=='haute')return -1;
+      if(b.priorite==='haute'&&a.priorite!=='haute')return 1;
+      return new Date(a.echeance||'9999')-new Date(b.echeance||'9999');
+    }).map(t=>{
+      const overdue = t.echeance && t.echeance < td();
+      const client = t.clientId ? clients.find(c=>c.id===t.clientId) : null;
+      return`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f1f5f9">
+        <button onclick="doneTask('${t.id}')" style="width:28px;height:28px;border-radius:50%;border:2px solid ${prioColor[t.priorite||'normal']};background:white;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px" title="Marquer comme fait">○</button>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;display:flex;align-items:center;gap:5px">
+            ${typeIcon[t.type]||'📋'} ${t.description||'—'}
+            ${t.priorite==='haute'?'<span class="pill p-r" style="font-size:9px">Urgent</span>':''}
+          </div>
+          ${client?`<div style="font-size:10px;color:var(--navy2)">${client.salon||client.nom}</div>`:''}
+          ${t.echeance?`<div style="font-size:10px;color:${overdue?'var(--crimson2)':'var(--slate2)'}">📅 ${fmt(t.echeance)}${overdue?' ⚠️ En retard':''}</div>`:''}
+        </div>
+        <button onclick="delTask('${t.id}')" style="background:none;border:none;color:var(--crimson3);cursor:pointer;font-size:16px">✕</button>
+      </div>`;
+    }).join('')+
+    (doneList.length?`<div style="padding:8px 14px;font-size:11px;color:var(--slate2);border-top:1px solid var(--slate3)">✅ ${doneList.length} tâche(s) complétée(s) récemment</div>`:'') :
+    '<div class="empty"><i class="ti ti-circle-check"></i><p>Aucune tâche en cours — tout est à jour !</p></div>';
+}
+
+function openTaskM(){
+  ['taskId','taskSrch','taskCid','taskDesc','taskDate'].forEach(e=>document.getElementById(e).value='');
+  document.getElementById('taskType').value='tache';
+  document.getElementById('taskPrio').value='normal';
+  document.getElementById('taskSug').style.display='none';
+  document.getElementById('taskPrev').classList.remove('show');
+  document.getElementById('taskTitle').textContent='Nouvelle tâche';
+  openOv('ovTask');
+}
+
+async function svTask(){
+  const id = document.getElementById('taskId').value || uid();
+  const task = {
+    id, type:document.getElementById('taskType').value,
+    clientId:document.getElementById('taskCid').value||'',
+    description:document.getElementById('taskDesc').value,
+    priorite:document.getElementById('taskPrio').value,
+    echeance:document.getElementById('taskDate').value,
+    done:false, createdAt:td()
+  };
+  const existing = tasks.findIndex(t=>t.id===id);
+  if(existing>=0) tasks[existing]=task; else tasks.unshift(task);
+  await saveTasksToFirebase();
+  cOv('ovTask'); rTasks();
+}
+
+async function doneTask(id){
+  const t = tasks.find(x=>x.id===id);
+  if(!t) return;
+  t.done=true; t.doneAt=td();
+  await saveTasksToFirebase();
+  rTasks(); rDash();
+}
+
+async function delTask(id){
+  if(!confirm('Supprimer cette tâche ?')) return;
+  tasks = tasks.filter(t=>t.id!==id);
+  await saveTasksToFirebase();
+  rTasks();
+}
+
+async function saveTasksToFirebase(){
+  try {
+    const ts = new Date().toISOString();
+    const res = await fetch(`${FB_URL}/meta/tasks`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fields:{
+        data:{stringValue:JSON.stringify(tasks)},
+        updated:{stringValue:ts}
+      }})
+    });
+    if(!res.ok) throw new Error('HTTP '+res.status);
+  } catch(e) {
+    localStorage.setItem('crm_tasks',JSON.stringify(tasks));
+  }
+}
+
+async function loadTasks(){
+  try {
+    const res = await fetch(`${FB_URL}/meta/tasks`,{headers:{'Content-Type':'application/json'}});
+    if(res.ok){
+      const doc = await res.json();
+      const data = fromFS(doc);
+      if(data&&data.data&&typeof data.data==='string'){
+        try { tasks = JSON.parse(data.data); } catch(e){}
+      }
+    } else if(res.status===404){
+      // Create empty tasks document
+      tasks = [];
+      await fetch(`${FB_URL}/meta/tasks`,{
+        method:'PATCH',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({fields:{data:{stringValue:'[]'},updated:{stringValue:new Date().toISOString()}}})
+      });
+    }
+  } catch(e){
+    const ls = localStorage.getItem('crm_tasks');
+    if(ls) try{ tasks=JSON.parse(ls); }catch(e2){}
+  }
+}
+
+boot();
+</script>
+<script>
+const RAW_CLIENTS=[
+["31730","102","Lorenzo","Maria","Coiffeuse","Industriestrasse 1","3951","Agarn","078 255 07 10","",0.0,226.0,0.0,"Actif"],
+["31549","102","Avant Garde","","Avant Garde","Chemin sous le Grand Pré 4","1860","Aigle","024 466 61 61","",0.0,843.0,665.0,"Actif"],
+["30863","102","Salar","Omar","Mésopotamie Coiffeur Barbier","Rue du Rhône 19","1860","Aigle","076 450 93 40","",0.0,523.0,614.0,"Actif"],
+["31597","112","Aliberti","Christel","Ô XIIIème Sàrl","Rue du Midi 13","1860","Aigle","024 466 47 66","078 587 52 74",0.0,127.0,657.0,"Actif"],
+["30158","112","De Masi","Patrizia","De Masi Style Coiffure","Rue du Krafft 7","1860","Aigle","078 671 00 38","",0.0,0.0,760.0,"Inactif"],
+["30702","112","Duarte","Tania","Unalum Salon de Coiffure","Rue du Bourg 9","1860","Aigle","024 466 22 58","",0.0,62.0,165.0,"Actif"],
+["31599","112","Gschwend","Laetitia","Letty Coiff' & Barbe","Chemin des Lieugex 14","1860","Aigle","077 524 27 25","",0.0,57.0,797.0,"Actif"],
+["23495","112","Nguyen","Line","Coiffure Hairline","Pré d'Emoz 31D","1860","Aigle","024 466 26 05","079 193 27 17",0.0,339.0,496.0,"Actif"],
+["30066","112","Salemi","Eliane","Tony Coiffure & Barbier","Rue du Bourg 38","1860","Aigle","078 948 00 29","",0.0,679.0,825.0,"Actif"],
+["30003","112","Sejdiu","Jetmir","Hella Coiffeur Barbier","Rue du Bourg 1","1860","Aigle","024 466 23 95","",0.0,0.0,741.0,"Inactif"],
+["20588","112","Neves","Susana","Coiffure Suzanne","Route de la Printse 29","1994","Aproz","027 203 07 70","078 623 35 44",0.0,951.0,1384.0,"Actif"],
+["28425","112","Pannatier","Caroline","Coiffure Prendre l'Hair","35, rue de Saxonne","1974","Arbaz","079 587 56 83","",0.0,2654.0,1188.0,"VIP"],
+["24801","112","Beney","Véronique","Coiffeuse","Route de la Riva 3","1974","Arbaz","027 398 57 62","079 643 87 55",0.0,740.0,678.0,"Actif"],
+["10762","112","Delaloye","Odile","Salon de Coiffure","Bâtiment Raiffeisen/Simplon 46","1957","Ardon","027 306 15 85","",0.0,195.0,1072.0,"Actif"],
+["18022","112","Exquis","Almène","Maison Almène Sàrl","Grands Vergers 4","1957","Ardon","027 306 75 75","079 278 12 79",0.0,1790.0,791.0,"Actif"],
+["31740","102","Correia","Océane","Coiffeuse","Route du Simplon 55","1957","Ardon","078 220 48 70","",0.0,323.0,0.0,"Actif"],
+["31352","102","Lopez Ribera","Marie","Coiffeuse","Rue des Epetys 3B","1957","Ardon","078 940 50 55","027 203 69 70",0.0,504.0,0.0,"Actif"],
+["31042","112","Correia","Delfina","Coiffeuse","Rue de la Meunière 16A","1957","Ardon","078 804 87 07","",0.0,0.0,331.0,"Inactif"],
+["12744","112","Mettan","Muriel","Coiffeuse","Rue du puits 9","1957","Ardon","079 128 25 77","078 760 15 96",0.0,3499.0,7053.0,"VIP"],
+["31679","102","Blanc","Hanitra","Le Salon de Coiffure 51","Grand-Rue 51","1616","Attalens","021 559 08 38","",0.0,388.0,0.0,"Actif"],
+["26350","102","Udrisard-Gavin","Céline","C sa Coiffure","Grand-Rue 42","1616","Attalens","021 947 39 39","079 635 05 70",0.0,628.0,766.0,"Actif"],
+["26202","112","Ibrahim Hasan","Semira","Bellerine Coiffure Mixte","Rue Centrale 43","1880","Bex","024 463 10 79","079 511 93 91",0.0,156.0,250.0,"Actif"],
+["31129","112","Jouan","Muhamad","Ramo Barbershop","Rue du Cropt 3","1880","Bex","078 733 62 63","078 743 49 43",0.0,0.0,168.0,"Inactif"],
+["29957","112","Krasniqi","Melidé","Coiffure Leona","Rue du Cropt 2","1880","Bex","079 377 09 59","",0.0,142.0,500.0,"Actif"],
+["26732","112","Naigeon","Sandrine","Salon Créati'ff","Rue Centrale 22","1880","Bex","024 463 35 90","",0.0,1233.0,2106.0,"Actif"],
+["12748","112","Pilet","Dominique","Salon de Coiffure Dominique","Rue Centrale 23 A","1880","Bex","024 463 17 56","",0.0,149.0,78.0,"Actif"],
+["29955","112","Wüthrich","Philippe","Coiffeur","Route des Pépinières 8","1880","Bex","024 463 23 33","",0.0,571.0,461.0,"Actif"],
+["30590","102","Blanc","Karine","La Tête dans les Etoiles","Route de Saint Jacques 8","1966","Blignoud (Ayent)","079 637 85 27","",0.0,0.0,129.0,"Inactif"],
+["29741","112","Ramos","Katia","Coiffure KR","Route de St-Jacques 33","1966","Blignoud (Ayent)","078 730 40 77","078 719 14 77",0.0,484.0,133.0,"Actif"],
+["31704","102","Lamasa","Ambre","L'Authentique par V.","Route du Village 26","1807","Blonay","079 908 82 19","021 931 63 07",0.0,147.0,0.0,"Actif"],
+["31602","102","Della Vecia","Nathacha","Coiffeuse","Chemin deu Couvant 11A","1807","Blonay","079 811 36 10","",0.0,0.0,27.0,"Inactif"],
+["26404","102","Gabriel","Aurélien","c/o Sophie Hair Service","Biolley-Centre","1615","Bossonnens","079 309 88 20","",0.0,0.0,124.0,"Inactif"],
+["17260","102","Monnard-Glassey","Sophie","Hair Service","Biolley-Centre/Rte d'Oron 2","1615","Bossonnens","021 947 53 47","079 358 82 65",0.0,557.0,376.0,"Actif"],
+["27249","102","Provost","Nathalie","Coiffure Elle et Lui","Rue du Lac 6","1897","Bouveret","024 481 56 76","",0.0,0.0,63.0,"Inactif"],
+["30063","112","Clerc","Raffaela","Coiffure Le Scalp","Route Cantonale 52","1897","Bouveret","024 481 46 81","",0.0,685.0,581.0,"Actif"],
+["31553","102","Pierri","Anastasia","coiffeuse","Route de Bugnon 9","1897","Bouveret","078 946 47 62","021 921 81 16",0.0,0.0,252.0,"Inactif"],
+["20268","112","Jost","Sonia","Salon Carmen","rue de la Cure 22","1967","Bramois","027 203 12 30","",0.0,862.0,1212.0,"Actif"],
+["20795","112","Lambiel","Christiane","Azur Coiffure","6, chemin du Levant","1967","Bramois","027 203 56 00","079 291 14 93",0.0,2286.0,2333.0,"VIP"],
+["31594","112","Roserens","Emma","Coiffeuse","Chemin de Grange Neuve 24","1934","Bruson","076 617 18 65","",0.0,0.0,159.0,"Inactif"],
+["31812","102","Meuwly","Marie","Le Cocon","c/o Rouge-Gorge SA","1630","Bulle","079 584 43 75","",0.0,687.0,0.0,"Actif"],
+["31043","102","Dagdeviren","Unal","c/o S Pass Coiffure","Chemin du Parc 1","1030","Bussigny-Lausanne","021 701 38 00","078 667 58 77",0.0,0.0,209.0,"Inactif"],
+["23479","102","Maegerli","Valérie","S Pass Coiffure","Chemin du Parc 1","1030","Bussigny-Lausanne","021 701 38 00","076 526 56 06",0.0,186.0,0.0,"Actif"],
+["31850","102","Rofidal","Gizem","Gizem Studio","Rue de Lausanne 5","1030","Bussigny-Lausanne","079 228 27 40","",0.0,231.0,0.0,"Actif"],
+["31851","102","Kujovic","Hana","Coiffeuse","Chemin du Cudrex 9","1030","Bussigny-Lausanne","076 225 26 96","021 534 46 19",0.0,365.0,0.0,"Actif"],
+["13594","102","Sousa-Biancaniello","Ida","Coiffure Rétro","8, rue de Lausanne","1030","Bussigny-près-Lausanne","021 701 20 03","",0.0,1635.0,111.0,"Actif"],
+["26362","102","Burlet","Régine","Coiffure Living'R","59, rue de l'Industrie","1030","Bussigny-près-Lausanne","021 701 09 01","078 749 29 39",0.0,211.0,0.0,"Actif"],
+["30859","102","Pouy","Roxane","c/o Coiffure Rétro","Rue de Lausanne 8","1030","Bussigny-près-Lausanne","021 701 20 03","",0.0,367.0,25.0,"Actif"],
+["31717","102","Aubry","Louanne","Coiffeuse","Avenue de la Gare 14","1955","Chamoson","079 322 59 64","027 722 19 17",0.0,108.0,0.0,"Actif"],
+["28616","112","Studio R Coiffure Sàrl","","Studio R Coiffure Sàrl","Rue du Village 60","1874","Champéry","076 778 34 31","",0.0,0.0,3197.0,"Inactif"],
+["21436","112","Romand","Irène","Coiffure Irène","Route du Lac 48","1938","Champex-Lac","079 668 74 57","",0.0,647.0,833.0,"Actif"],
+["29768","112","Terreaux","Emilie","Coiffeuse à domicile","Le Ranconnex 3","1906","Charrat","079 229 40 88","",0.0,0.0,96.0,"Inactif"],
+["31522","102","Aeschlimann","Alison","Alison Coiffure","Route de Montreux 7","1618","Châtel-St-Denis","076 801 64 93","",0.0,0.0,137.0,"Inactif"],
+["31242","102","Lambert","Sabrina","Sea Holly","Place de la Gare 16","1618","Châtel-St-Denis","021 948 09 09","079 694 27 10",0.0,0.0,98.0,"Inactif"],
+["30779","102","Couto","Helder","Coiffure Figaro","Grand Rue 24","1618","Châtel-St-Denis","021 948 74 25","",0.0,0.0,471.0,"Inactif"],
+["31242","102","Morel","Noémie","Noémie Hair Beauty","Route des Pléiades 74","1618","Châtel-St-Denis","079 724 62 07","",0.0,0.0,98.0,"Inactif"],
+["31472","102","Simon","Marion","Simon's Coiffure","Grand-Rue 57","1618","Châtel-St-Denis Dist","077 236 00 37","",0.0,0.0,208.0,"Inactif"],
+["16487","102","Parente","Pascal","c/o Ciseaux D'Or","Avenue de la Gare 4","1022","Chavannes-près-Renens","079 828 86 74","021 634 53 24",0.0,0.0,0.0,"Actif"],
+["26478","102","Parent","Valérie","Coiffure Tête-à-Tête","Rue Centrale 26","1022","Chavannes-près-Renens","021 634 22 67","",0.0,1262.0,1475.0,"Actif"],
+["19699","102","Burnier","Michel","Coiffure aux ciseaux d'or","4, avenue de la gare","1022","Chavannes-Renens","021 634 53 24","",0.0,419.0,298.0,"Actif"],
+["26706","112","Spring","Yasmine","'La Loge' Coiffure","Rue de Tsampéhro 8","3971","Chermignon-d'en-Bas","079 947 25 00","",0.0,217.0,187.0,"Actif"],
+["12462","102","Head","Laurence","Coiffure Mirage","Avenue Centrale 27","1885","Chesières","021 921 32 70","078 642 31 97",0.0,0.0,344.0,"Inactif"],
+["31055","102","Conne","Cécile","CC Coiffure","Rue du Bourg 5","1071","Chexbres","079 939 40 02","",0.0,0.0,521.0,"Inactif"],
+["31094","102","Gaudin","Magalie","c/o CC Coiffure","Rue du Bourg 5","1071","Chexbres","079 350 93 39","079 939 40 02",0.0,536.0,0.0,"Actif"],
+["20622","102","Wuillemin","Nathalie","Coiffure-Institut Alézia","Chemin des Rueyres 7","1071","Chexbres","021 946 27 00","",0.0,0.0,278.0,"Inactif"],
+["30425","112","Palumbo","Michela","M Coiffure","Grande Avenue 3","3965","Chippis","078 976 49 22","",0.0,439.0,0.0,"Actif"],
+["25836","112","Pescatore","Erico","Coiffure Hair-Box","Rue de Saint-Urbain 5","3965","Chippis","027 455 97 10","079 215 83 23",0.0,254.0,169.0,"Actif"],
+["31563","102","Beldron","Mariluz","Coiffure Marilou","c/o EMS Beau-Site","1815","Clarens","079 824 21 78","021 989 53 99",0.0,138.0,0.0,"Actif"],
+["16358","102","Bouvet","Pascal","c/o Emeraude Coiffure","Rue du Grammont 7","1815","Clarens","079 637 67 51","021 964 22 23",0.0,55.0,22.0,"Actif"],
+["14353","102","Caravello","Helen","Coiffure Helen & Nadia","1, avenue Mayor-Vautier","1815","Clarens","021 964 12 57","",0.0,998.0,321.0,"Actif"],
+["16476","102","Ducraux","Esmeralda","Emeraude Coiffure","7, rue du Grammont","1815","Clarens","021 964 22 23","",0.0,1048.0,1107.0,"Actif"],
+["18754","102","Durgnat","Myriam","Coiffure Expression","26, avenue Mayor-Vautier","1815","Clarens","079 659 03 57","",0.0,1002.0,57.0,"Actif"],
+["19972","102","Jacquier","Huguette","Flash Coiffure","22, rue Gambetta","1815","Clarens","021 964 17 04","",0.0,0.0,84.0,"Inactif"],
+["30831","102","Pakniyat","Hadi","Studio 27","Rue Gambetta 27","1815","Clarens","021 961 90 00","",0.0,74.0,107.0,"Actif"],
+["27184","102","Perrin","Noam","Renaissance Hair Styling","Rue du Lac 86","1815","Clarens","021 960 46 68","",0.0,0.0,181.0,"Inactif"],
+["18389","102","Piceci","Anaïs","Coiffure Caprice","19, rue Gambetta","1815","Clarens","021 964 27 12","",0.0,153.0,233.0,"Actif"],
+["31903","112","Joss elisa","","Ambiance Coiffure SARL","Zone Artisanale Pré Jacquet 1","1868","Collombey","024 472 50 40","079 374 24 62",0.0,2835.0,2735.0,"VIP"],
+["31903","102","Joss elisa","Elisa","Ambiance Coiffure SARL","Zone Artisanale Pré Jacquet 1","1868","Collombey","024 472 50 40","",0.0,0.0,0.0,"Actif"],
+["27586","112","Jordan","Tatiana","c/o House of Beauty","Rue du Clos-Novex 47","1868","Collombey","024 471 29 70","076 326 75 18",0.0,102.0,606.0,"Actif"],
+["31744","102","Roch","Aurélie","ROC'Hair","Route de la Fin 2","1868","Collombey","079 779 59 08","",0.0,548.0,0.0,"Actif"],
+["13018","112","Jordan","Daniela","House of Beauty","Rue du Clos-Novex 47","1868","Collombey","079 794 95 90","024 565 65 64",0.0,521.0,738.0,"Actif"],
+["31520","102","Bailo","Joannie","Coiffeuse","Rue des Dents du Midi 27","1868","Collombey","079 722 28 62","",0.0,0.0,344.0,"Inactif"],
+["31573","102","Goncalves","Liliana","Coiffeuse","Chemin de la Barme 29","1868","Collombey","079 286 00 35","",0.0,62.0,171.0,"Actif"],
+["31675","102","Pessoa Prior","Sofia","c/o Olux Hair SA","Route des Rottes 15","1964","Conthey","027 346 11 77","079 479 02 05",0.0,238.0,0.0,"Actif"],
+["28145","112","D'Oria","Gloriana","Gloriana Coiffure","Rue Centrale 64","1964","Conthey","079 818 45 41","",0.0,617.0,0.0,"Actif"],
+["31020","102","Bovay","Léa","Atelier Coiffure 23","Route Cantonale 36","1964","Conthey","079 568 48 84","",0.0,129.0,256.0,"Actif"],
+["30574","102","Follonier","Nadège","Signature coiffure","Avenue de la Gare 39","1964","Conthey","078 806 30 28","",0.0,832.0,522.0,"Actif"],
+["31747","102","Martins","Christina","CHRISTINA. Coiffure","Rue des Fougères 25","1964","Conthey","027 346 23 97","",0.0,422.0,0.0,"Actif"],
+["27260","112","Gidor Coiffure*","","Centre Commercial","Forum des Alpes","1964","Conthey","027 346 45 70","",0.0,1933.0,462.0,"Actif"],
+["10790","112","Les Mots d'Elle Sàrl","","Atelier Capillaire","18, avenue de la Gare","1964","Conthey","027 346 43 44","079 409 36 44",0.0,0.0,92.0,"Inactif"],
+["23815","112","Trachsler","Laurent","Coiffure R Play Studio","9, rue de la Gare","1964","Conthey","027 346 25 24","",0.0,158.0,229.0,"Actif"],
+["31689","102","Claire Concept Beauty Sàrl","","Claire Coiffure Beauté","Avenue des Jordils 19","1802","Corseaux","021 921 46 00","",0.0,464.0,0.0,"Actif"],
+["31802","102","Gonçalves Faustino","Jessica","Coiffure Souffle de Vie","rue du Village 18A","1802","Corseaux","021 922 44 22","079 887 91 38",0.0,814.0,0.0,"Actif"],
+["24549","102","Menetrey Tania & Antunes Sofia","","Coiffure Souffle de Vie","rue du Village 18A","1802","Corseaux","021 922 44 22","078 619 08 63",0.0,4704.0,1880.0,"VIP"],
+["24205","112","Cavallo","Pierre André","Coiffure Pierre André","Rue Centrale 15","3963","Crans-Montana","027 481 02 02","",0.0,0.0,202.0,"Inactif"],
+["10778","112","Di Stasi","Jérôme","Coiffure Pierre","Rue Théodore Stéphani 4","3963","Crans-Montana","027 481 38 38","",0.0,955.0,1086.0,"Actif"],
+["10758","112","Di Stasi","Yvette","Coiffure Yvette","15, Villa les Murettes","3963","Crans-Montana","027 481 43 18","",0.0,1115.0,1250.0,"Actif"],
+["18414","112","Francey","Valérie","Coiffure Mod'Line","Galerie de la Poste","3963","Crans-Montana","027 481 25 11","",0.0,116.0,116.0,"Actif"],
+["21077","112","Martins","Lucidia","Coiffure New Look","Route du Rawyl 26","3963","Crans-Montana","027 480 24 34","",0.0,424.0,0.0,"Actif"],
+["31690","102","Pereira","Maria Helena","Coiffeuse","Route de la Combaz 6","3963","Crans-Montana","078 901 81 15","",0.0,978.0,0.0,"Actif"],
+["31560","112","Teixeira Freitas Oliviera","Fabiana","Coiffeuse","Rue Centrale 7","3963","Crans-Montana","079 612 44 79","",0.0,0.0,108.0,"Inactif"],
+["16380","112","De Levrano","Nathalie","Coiffure Nathalie","Case postale 282 / Av. Gare 6","3963","Crans-Montana 1","027 480 20 44","",0.0,577.0,279.0,"Actif"],
+["17692","112","Ezequiel","Tânia","Salon de Coiffure Tania","Imm. ESR S.I. Sion Albert","3963","Crans-Montana 1","027 481 66 12","079 240 53 79",0.0,1166.0,1220.0,"Actif"],
+["23934","112","Trilogie Beauté","","à l'attn de Mme Lamon A.-L.","Route du Rawyl 45 / Vignettes","3963","Crans-Montana 1","027 481 60 91","079 435 26 06",0.0,145.0,1145.0,"Actif"],
+["24335","112","Rennaz","Rosanna","Coiffure Jean-Pierre","Imm. Xirès-Sud/Rue Centrale 6","3963","Crans-sur-Sierre","027 481 40 68","",0.0,1060.0,1010.0,"Actif"],
+["31680","102","Giuseppe le Coiffeur","","Autieri Sàrl","Rue du Jura 4","1023","Crissier","021 323 24 87","078 634 33 37",0.0,193.0,0.0,"Actif"],
+["30291","102","Pinto Branco","Sandra","Espace Beauté 8 mars","Rue du Jura 9","1023","Crissier","021 633 79 51","078 878 03 77",0.0,119.0,2588.0,"Actif"],
+["30737","102","Varela","Montserrat","Moon Coiffure","Chemin de la Pierre 16","1023","Crissier","021 534 25 82","079 246 74 14",0.0,1253.0,1744.0,"Actif"],
+["24365","102","Amado","Cristina","Attrap'Tifs","Chemin du Monte-Faux 6","1023","Crissier","079 912 78 66","021 633 78 66",0.0,813.0,299.0,"Actif"],
+["31661","102","Nsimba","Makumba","Coiffeuse","Chemin des Lentillières 5B","1023","Crissier","076 304 17 23","",0.0,238.0,0.0,"Actif"],
+["28393","112","Clausen","Nathalie","C' dans l'hair Coiffure","31, route de Oure","1965","Drône VS","079 377 80 31","",0.0,712.0,483.0,"Actif"],
+["31247","102","Fondation Adrian Orllati","","Mme Erlinda Orllati","Route de Bettens 13","1040","Echallens","0848 767 767","",0.0,323.0,347.0,"Actif"],
+["21861","102","Dos Santos-Xavier","Cristina","Dos Santos-Xavier Cristina","ZI Les Portettes 10","1312","Eclépens","","078 803 91 61",0.0,5827.0,5619.0,"VIP"],
+["31451","102","Alic","Lija","Lija Coiffure","Avenue d'Epenex 10","1024","Ecublens VD","079 923 51 44","",0.0,0.0,67.0,"Inactif"],
+["29641","102","Elhoussaine","Kazouane","Kazouane Coiffure","Tir Fédéral 16","1024","Ecublens VD","021 634 11 78","",0.0,206.0,0.0,"Actif"],
+["31524","102","Memisevic","Mirela","Centre de Beauté Coiffure","Avenue du Tir-Fédéral 14","1024","Ecublens VD","021 634 52 00","076 583 27 05",0.0,160.0,189.0,"Actif"],
+["24738","102","Berischa Dedic","Belmina","Coiffeuse","Avenue du Tir- Fédéral 30","1024","Ecublens VD","021 616 75 81","076 330 15 72",0.0,0.0,413.0,"Inactif"],
+["30896","102","Perdomo","Pénélope","L'Artiste Coiffure","Route d'Echallens 10","1037","Etagnières","","079 745 78 73",0.0,1716.0,1594.0,"Actif"],
+["31736","102","Saint-Cerin","Charly","Coiffeur","Route des Condémines 23","1983","Evolène","079 381 95 66","",0.0,101.0,0.0,"Actif"],
+["31525","102","Ebener","Carolin","Coiffure Chez Caroline","Talstrasse 22","3916","Ferden","027 939 25 32","079 827 32 39",0.0,61.0,612.0,"Actif"],
+["26257","102","Rouge","Martine","Coiffure Histoire de Plaire","Passage du Cerf d'Or 2","1072","Forel (Lavaux)","021 781 27 26","",0.0,0.0,77.0,"Inactif"],
+["10322","112","Perret","Christine","Coiffure Adiante","13,rue Maison de Commune","1926","Fully","027 746 13 35","",0.0,0.0,229.0,"Inactif"],
+["26529","102","Bussard","Aurélie","Coiffure La Mèche d'Ange","Route de Palézieux 10","1614","Granges (Veveyse)","076 439 80 01","",0.0,402.0,0.0,"Actif"],
+["31794","102","Guillèn","Carlos","Coiffure le Tiffier","Les Combes 54","1971","Grimisuat","078 768 18 40","",0.0,1974.0,0.0,"Actif"],
+["31465","102","Neuhaus","Isabelle","Belle Coiffure","Route de Sion 11","1971","Grimisuat","027 398 30 00","",0.0,0.0,388.0,"Inactif"],
+["20749","112","Llukes","Marta","Coiffure Le Coup de Ciseaux","C. Cial Les Crêtes","1971","Grimisuat","027 398 16 26","078 802 46 57",0.0,4063.0,2804.0,"VIP"],
+["26276","112","Deriaz","Anne-Laure","Coiffure LOOK IN","Rue Centrale 125","3979","Grône","027 458 44 33","078 627 84 10",0.0,915.0,922.0,"Actif"],
+["23977","112","Jacob","Valérie","Coiffure 'à Coeur de plaire'","rue Centrale 168","3979","Grône","027 458 23 59","",0.0,895.0,250.0,"Actif"],
+["10025","112","Délèze-Venetz","Jessica","MJ Hair Spa","Route de la Télécabine 12","1997","Haute-Nendaz","027 288 16 36","",0.0,0.0,784.0,"Inactif"],
+["10759","112","Praz","Catherine","Coiffure Les Arcades SARL","Route des Ecluses 4","1997","Haute-Nendaz","027 288 20 67","",0.0,764.0,1273.0,"Actif"],
+["26312","102","Borisavljevic","Daniel","Salon B72","Rue du Léman 3","1814","La Tour-de-Peilz","021 921 43 57","079 295 17 91",0.0,1847.0,878.0,"Actif"],
+["14088","102","Chavannes","Martine","Coiffure","Grand-Rue 3","1814","La Tour-de-Peilz","021 944 33 34","",0.0,0.0,406.0,"Inactif"],
+["30642","102","Oizel","Alexandra","Salon de Coiffure La Galerie","Grand-Rue 3","1814","La Tour-de-Peilz","021 944 33 34","",0.0,284.0,786.0,"Actif"],
+["31211","102","Perrin & Giza","","Coiffure No Limit","Grand-Rue 41","1814","La Tour-de-Peilz","021 944 54 06","",0.0,565.0,367.0,"Actif"],
+["31728","102","Pertuiset","Nong","Design'Hair Coiffure","Avenue de Traménaz 2","1814","La Tour-de-Peilz","021 944 25 83","",0.0,2842.0,0.0,"VIP"],
+["21120","102","Sculati","Martine","Coiffure Préludes","Grand-Rue 1","1814","La Tour-de-Peilz","021 921 13 91","",0.0,0.0,21.0,"Inactif"],
+["30080","102","Arbez","Valérie","Hair In The City","Rue Etraz 4","1003","Lausanne","078 659 58 61","021 311 13 76",0.0,598.0,222.0,"Actif"],
+["31772","102","Bilitys","Céline","Luxury Hair","21, avenue du Leman","1005","Lausanne","079 853 40 68","",0.0,298.0,0.0,"Actif"],
+["31782","102","Dani","Elsa","Salon By Me","Avenue de la Sallaz 31","1010","Lausanne","021 551 57 77","",0.0,159.0,0.0,"Actif"],
+["10973","102","Duc","Dolly","Coiffure Dolly","Valentin 68","1018","Lausanne","079 521 34 09","021 646 25 00",0.0,124.0,65.0,"Actif"],
+["26324","102","Keller Nadine & Musy Laurence","","Hair R Studio","Av. de Mon-Repos 14","1005","Lausanne","021 311 41 19","",0.0,245.0,0.0,"Actif"],
+["31460","102","Lora Coiffure Sàrl","","Lora Coiffure Sàrl","15, rue Beau-Séjour","1003","Lausanne","021 311 55 57","",0.0,0.0,133.0,"Inactif"],
+["16648","102","Maturana","Begonia","Coiffure Begonia","1, rue Saint Pierre/Entresol","1003","Lausanne","021 312 73 35","079 558 13 23",0.0,0.0,42.0,"Inactif"],
+["15492","102","Monnier-Jenni","Johanna","Coiffure Masculine Johanna","Ancienne-douane 3","1003","Lausanne","021 323 96 76","",0.0,0.0,98.0,"Inactif"],
+["15552","102","Oberson","Agnès","c/o Coiffure du Maupas","Rue du Maupas 26","1004","Lausanne","021 646 61 33","076 592 29 69",0.0,287.0,327.0,"Actif"],
+["29702","102","Pelleriti S. & Zurcher A.","","L'Hair d'un Rêve Coiffure","Rue du Valentin 30","1004","Lausanne","021 525 25 59","078 918 45 63",0.0,0.0,196.0,"Inactif"],
+["30686","102","Ramos","Maria","c/o LJ Coiffure","Avenue de La Sallaz 31","1010","Lausanne","079 714 04 26","",0.0,0.0,224.0,"Inactif"],
+["31523","102","Rezai","Sahra","La Signature","Chemin du Montelly 48","1007","Lausanne","021 625 12 81","079 196 92 37",0.0,179.0,196.0,"Actif"],
+["23439","102","Robert Manoukian","Patrice","La Beauté, tout un Art","Avenue de Cour 9","1007","Lausanne","021 634 59 14","078 804 43 32",0.0,418.0,1172.0,"Actif"],
+["31492","102","SPA du Royal","","SPA du Royal","40, avenue D'Ouchy","1006","Lausanne","021 614 88 88","",0.0,0.0,657.0,"Inactif"],
+["30154","102","Valdez","Wanda","Evaless Hairdressing","Rue de la Pontaise 41","1018","Lausanne","079 824 54 21","078 838 90 31",0.0,767.0,354.0,"Actif"],
+["31540","102","Vivat","Florian","Le Barbier de Lausanne","Rue Enning 1","1003","Lausanne","078 916 10 46","",0.0,0.0,61.0,"Inactif"],
+["31842","102","Xtnd Studio","","Espace Bourg Galeries","Rue du Bourg 20","1003","Lausanne","078 261 35 30","079 775 85 39",0.0,959.0,0.0,"Actif"],
+["30292","102","Ymrukel","Saniye","Coiffure à domicile","Rue Pré-du-Marché 7","1004","Lausanne","078 618 92 46","",0.0,739.0,538.0,"Actif"],
+["31517","102","Zabala Gil","Maria Teresa","Esthéticienne Pro","Avenue de Beaulieu 7","1004","Lausanne","077 958 72 04","",0.0,188.0,219.0,"Actif"],
+["30677","102","Bernard","Suzy","Coiffure 2ème Avenue","Avenue Fantaisie 2","1006","Lausanne","021 616 47 34","079 567 35 42",0.0,472.0,0.0,"Actif"],
+["19433","102","Berthoud","Michèle","Coiffure Athénée","11, rue Caroline","1003","Lausanne","021 323 13 08","079 304 07 54",0.0,705.0,856.0,"Actif"],
+["31323","102","Borin","Sandra","Salon 28 Coiffure","Rue Saint-Roch 28","1004","Lausanne","078 920 00 25","",0.0,426.0,0.0,"Actif"],
+["25264","102","Charles-Barc","Béatrice","Arts Coiffure","Rue du Midi 10","1003","Lausanne","021 323 56 12","078 842 08 85",0.0,378.0,355.0,"Actif"],
+["21347","102","Clark","Hulda","Coiffure Dolly et Hulda","Rue du Valentin 68","1004","Lausanne","021 646 61 35","079 461 81 58",0.0,892.0,623.0,"Actif"],
+["27820","102","COFOP (secteur Coiffure)","","Mme Anne Marie Vésy","Av. de Valmont 24","1010","Lausanne","021 316 97 95","",0.0,7708.0,9230.0,"VIP"],
+["10712","102","Ferreyra","Liliane","Coiffure Sonia","16, ave des Toises","1005","Lausanne","021 323 45 28","",0.0,1968.0,1235.0,"Actif"],
+["31801","102","Ghazi","Anthony","Légende du Barbier","Avenue Louis-Ruchonnet 33","1003","Lausanne","078 249 03 63","",0.0,-25.0,0.0,"Actif"],
+["17910","102","Gonçalves","Olinda","Coiffure","22, ave Vallonette","1012","Lausanne","021 652 25 92","",0.0,676.0,232.0,"Actif"],
+["26305","102","Guelpa","Sandrine","Coiffure Sandrine","avenue des Bergières 42","1004","Lausanne","021 648 22 05","",0.0,176.0,0.0,"Actif"],
+["30995","102","Huguelet","Aline","Coiffure Aurora","Chemin de Boisy 34","1004","Lausanne","021 646 92 13","076 455 48 79",0.0,0.0,158.0,"Inactif"],
+["27233","102","Kozarova","Katia","Coiffure Katia Créa'tif","Les Galeries de Dorigny BSF 2","1015","Lausanne","021 692 26 94","079 614 34 20",0.0,885.0,881.0,"Actif"],
+["31685","102","Le Repuis Coiffure","","Centre de formation","Rue Centrale 6, 1er étage","1003","Lausanne","024 447 40 89","024 445 44 61",0.0,642.0,0.0,"Actif"],
+["30952","102","Pesi","Roberto","Coiffeur & Coloriste","Rue du Midi 16","1003","Lausanne","021 311 11 16","",0.0,1746.0,306.0,"Actif"],
+["24600","102","Pillonel","Carmen","Carmen America's","Rue Saint-Roch 8","1004","Lausanne","021 311 05 70","079 156 50 40",0.0,198.0,350.0,"Actif"],
+["26833","102","Rechsteiner","Sonja","Coiffure Linéa Hair","Avenue de Rumine 5","1005","Lausanne","078 615 49 15","021 312 99 74",0.0,1500.0,692.0,"Actif"],
+["31609","102","Softic","Adela","AD Coiffure","Avenue Alexandre-Vinet 16","1004","Lausanne","021 646 03 97","",0.0,0.0,506.0,"Inactif"],
+["30813","102","Nimo","Victor","Coiffeur","Rue du Maupas 63","1004","Lausanne","078 638 70 67","",0.0,57.0,0.0,"Actif"],
+["31518","102","Tartaglia","Miléna","Salon Autentico","Chemin du Boisy 10","1004","Lausanne","021 647 63 06","078 227 72 71",0.0,0.0,371.0,"Inactif"],
+["30905","102","Uwakwe","Tony","Black And White","Rue de la Pontaise 34","1018","Lausanne","021 558 87 83","079 578 16 22",0.0,576.0,383.0,"Actif"],
+["31681","102","Veseli","Moira & Débora","Style & Elégance","Avenue du Léman 69","1005","Lausanne","021 214 24 34","",0.0,1121.0,0.0,"Actif"],
+["31687","102","Petitjean","Marie","Coiffeuse","AVenue Warnery 14","1007","Lausanne","079 342 52 03","",0.0,57.0,0.0,"Actif"],
+["31461","112","Stöckli","Valérie","Coiffure Le Passage","1, rue du Midi","1003","Lausanne","076 473 12 24","",0.0,0.0,238.0,"Inactif"],
+["30765","102","Thevenet","Marta","Coiffeuse","Chemin de Boissonnet 63","1010","Lausanne","076 413 27 20","021 616 27 20",0.0,0.0,206.0,"Inactif"],
+["30666","102","Coelho","Marco","MC Coiffure","Chemin du Rionzi 29/Arcade 103","1052","Le Mont-sur-Lausanne","","076 322 93 84",0.0,142.0,332.0,"Actif"],
+["31664","102","Da Silva Goncalves","Paula","Coiffeuse","Chemin de l'Hermitage 10","1619","Les Paccots","","",0.0,48.0,0.0,"Actif"],
+["13250","112","Pellaud","Rosette","Coiffure La Bohême","27, rue des Comballes","1932","Les Valettes (Bovernier)","027 722 77 38","079 464 54 04",0.0,0.0,410.0,"Inactif"],
+["22380","112","Michellod","Caroline","Atmosp'Hair Coiffure","Route d'Ovronnaz 4","1912","Leytron","027 306 34 30","078 767 45 24",0.0,1001.0,0.0,"Actif"],
+["30777","102","Blanchet","Delphine","Coiffeuse","Route du Stade 20","1912","Leytron","079 719 81 27","027 565 64 64",0.0,612.0,731.0,"Actif"],
+["18607","112","Darbellay","Marie-Noëlle","Atelier de Coiffure","Route du Gd-St-Bernard 33","1945","Liddes","027 783 25 80 P","078 644 14 80 G",0.0,2747.0,5411.0,"VIP"],
+["27774","112","Troillet-Darbellay","Maude","Atelier de Coiffure","Route du Gd-St-Bernard 33","1945","Liddes","079 658 48 61","",0.0,2985.0,1859.0,"VIP"],
+["31816","102","Ribeiro Sousa","Samuel","Coiffeur","Route des Mousses 6","1148","L'Isle","076 824 44 98","",0.0,365.0,0.0,"Actif"],
+["23197","102","Arte Beauty Sàrl","","Salon de Coiffure","Cent. Commercial  les Moulins","1095","Lutry","021 534 46 19","078 674 96 79",0.0,0.0,100.0,"Inactif"],
+["23533","102","Carrichon","Fabien","Hairstylist & Colorist","Grand-Rue 1","1095","Lutry","021 888 06 05","",0.0,2478.0,0.0,"VIP"],
+["17825","102","Lipizzi","Liliane","Coiffure Arcades","Grand Rue 17","1095","Lutry","021 791 44 33","",0.0,0.0,193.0,"Inactif"],
+["20785","102","Orciuoli","Nicola","Coiffure Rebelles","7, rue des Terreaux","1095","Lutry","021 791 51 60","079 351 56 87",0.0,2805.0,2410.0,"VIP"],
+["29685","102","Salgueiro","Ana","Bischoff Coiffure","Grand-Rue 29","1095","Lutry","021 791 31 20","",0.0,109.0,169.0,"Actif"],
+["30091","102","Santoro","Andrea","Tiff-Ologue","Grand-Rue 29","1095","Lutry","079 775 77 00","",0.0,1059.0,354.0,"Actif"],
+["21172","102","Sugnaux","Sylviane","Coiffeuse","45, route d'Humilimont","1633","Marsens","026 915 32 03","079 820 96 50",0.0,262.0,266.0,"Actif"],
+["30808","102","Blanc","Cindy","Institut La Natur'elle","Avenue de la Gare 54","1920","Martigny","079 107 97 72","",0.0,864.0,1693.0,"Actif"],
+["31731","102","Fernandes","Christiana","c/o Salon J'adore","Rue du Simplon 35","1920","Martigny","027 565 60 29","079 460 62 24",0.0,1043.0,0.0,"Actif"],
+["19984","112","Abazi","Lumnija","Anisa Coiffure","52, avenue de la Gare","1920","Martigny","027 722 09 73","078 677 15 89",0.0,0.0,413.0,"Inactif"],
+["29772","112","Clinique du Cheveu","","Clinique du Cheveu","Avenue de la Gare 29","1920","Martigny","027 722 09 50","079 921 80 40",0.0,0.0,279.0,"Inactif"],
+["17393","112","Fusco","Florine","Studio Coiffure","Place Centrale 4","1920","Martigny","027 722 23 14","078 866 96 45",0.0,0.0,-121.0,"Actif"],
+["27677","112","Hairmisa Sàrl","","Passion Coiffure S & M","Place du Manoir 1","1920","Martigny","079 199 82 78","0 27 722 44 98",0.0,151.0,0.0,"Actif"],
+["28717","112","Roduit","Pelin","Pelin Coiffure","Rue de l'Hôtel-de-Ville 8","1920","Martigny","027 722 22 80","079 770 60 98",0.0,150.0,325.0,"Actif"],
+["24898","112","Roh","Pierre-Alain","Roh Pierre-Alain","Rue des Sorbiers 14","1920","Martigny","027 722 33 64","079 220 74 04",0.0,141.0,245.0,"Actif"],
+["30799","102","Hairlines Coiffure-Barber Shop","","Mourad Ahmed","Avenue du Gd-St-Bernard 19","1920","Martigny","027 722 14 94","079 844 96 86",0.0,57.0,354.0,"Actif"],
+["29658","102","Lopes Gouveia","Sandra","Coiffure Mo'tiff","Rue de l'Hôpital 7","1920","Martigny","077 460 23 87","",0.0,988.0,1367.0,"Actif"],
+["31612","102","Platania","Patrizia","L'air du temps Coiffure","Rue du Bourg 21","1920","Martigny","078 610 60 62","",0.0,0.0,313.0,"Inactif"],
+["24895","112","Alter","Aurélie","Clov'hair Coiffure","Rue du Bourg 31","1920","Martigny","","079 810 30 36",0.0,848.0,990.0,"Actif"],
+["29730","112","Avant-Garde Coiffure","","Avant-Garde Coiffure","Av. de Fully 53/C.Cial Cristal","1920","Martigny","027 720 61 81","",0.0,110.0,1860.0,"Actif"],
+["27044","112","Avant-Garde SARL","","Avant-Garde SARL","Rue du Collège 3","1920","Martigny","027 722 26 11","",0.0,0.0,875.0,"Inactif"],
+["31365","102","Avanthay","Kassidy","Coiffeuse","Rue des Finettes 15","1920","Martigny","079 546 55 25","",0.0,0.0,554.0,"Inactif"],
+["19137","112","Biondo","Dominique","Coiffure Boucles d'Or","34, av. du Grand-St-Bernard","1920","Martigny","027 722 05 04","",0.0,1445.0,784.0,"Actif"],
+["31779","102","Destegul","Vildan","Coiffeur","Rue des Finettes 11","1920","Martigny","079 730 93 74","",0.0,238.0,0.0,"Actif"],
+["26092","112","Biondo","Lizeth","Lizeth Coiffure","Les Fumeaux 18a","1920","Martigny","","079 810 25 68",0.0,1032.0,3282.0,"Actif"],
+["30114","112","Bourgeois","Alexandra","Coiffure Madame Alex","Bourg 41","1920","Martigny","079 842 62 45","",0.0,721.0,0.0,"Actif"],
+["30168","112","Dessange Paris","","Coiffeur Coloriste Maquilleur","Avenue de Fully 63","1920","Martigny","027 722 00 60","",0.0,455.0,993.0,"Actif"],
+["10945","112","Fellay","Véronique","Coiffure Vogue","Rue du Léman 12","1920","Martigny","027 722 17 71","079 2096006",0.0,7245.0,6896.0,"VIP"],
+["31510","102","Sinanaj","Luiz","Coiffeuse","Rue de Vienne 27X","1920","Martigny","","",0.0,0.0,230.0,"Inactif"],
+["17900","112","Ferreira","Bruno","Coiffure Préville","7, rue de la Poste","1920","Martigny","027 722 19 17","079 436 60 30",0.0,1348.0,345.0,"Actif"],
+["23608","112","Hugon","Paola","Coiffure Elysée","2, rue du Rhône","1920","Martigny","027 722 15 71","",0.0,737.0,105.0,"Actif"],
+["31595","112","Aubruy","Louane","Coiffeuse","Rue d'Oche 14","1920","Martigny","079 322 59 64","",0.0,0.0,304.0,"Inactif"],
+["14359","112","Inserra","Ciro","CIRO Coiffure","Rue du Grand-Verger 16","1920","Martigny","027 722 88 29","",0.0,118.0,443.0,"Actif"],
+["30506","112","Roduit","Aurélie","L'Identité Coiffure","Avenue de la Gare 10","1920","Martigny","027 722 15 46","",0.0,314.0,284.0,"Actif"],
+["10338","112","Schaer","Delphine","Le LoKal Coiffeur Créateur","Pré-de-Foire 5","1920","Martigny","076 412 05 75","",0.0,295.0,1005.0,"Actif"],
+["21108","112","Val","Krystel","Atelier K","5, rue du Rhône","1920","Martigny","027 722 98 30","",0.0,876.0,555.0,"Actif"],
+["12145","112","Reynard","Liliane","Coiffeuse","Rue des Cèdres 9","1920","Martigny","078 817 90 89","",0.0,1109.0,1313.0,"Actif"],
+["25216","112","Biselx","Christine","Atelier Coiffure","Route de la Croix 11","1921","Martigny-Croix","027 721 62 22","",0.0,2040.0,2367.0,"VIP"],
+["13331","112","Mosteau","Yvonnick","Coiffure Yvonnick","Route du Grand St-Bernard 5","1921","Martigny-Croix","027 722 05 77","",0.0,0.0,1453.0,"Inactif"],
+["10941","112","Rouiller","Nelly","Coiffure","13, route des Rappes","1921","Martigny-Croix","027 722 54 43","",0.0,1215.0,1459.0,"Actif"],
+["29644","112","Rola","Paola","Coiffeuse","Route de Malapalud 15","1692","Massonnens","026 653 06 78","079 425 33 08",0.0,0.0,37.0,"Inactif"],
+["12234","112","Murisier-Masserey","Malika","Coiffure Malika","4, route Chivirau","3972","Miège","027 456 24 67","079 766 91 73",0.0,6082.0,4491.0,"VIP"],
+["31582","102","Christoph","Alicia","Coiffeuse","Rue de la Batteuse 9","3963","Montana","078 330 14 10","",0.0,0.0,142.0,"Inactif"],
+["28568","102","Wyss","Chantal","Label Couleur","Route d'Ursy 3","1674","Montet (Glâne)","","",0.0,610.0,169.0,"Actif"],
+["12166","112","Giroud","Sylviane","Création Sylviane","Route des Aunaires 15A","1870","Monthey","079 887 19 96","079 348 23 71",0.0,844.0,1007.0,"Actif"],
+["24881","112","Guetif","Jessica","Coiffure à domicile","Route du Tonkin 18B","1870","Monthey","079 889 89 25","",0.0,297.0,299.0,"Actif"],
+["31419","102","Frouin","Mélanie","Création Coiffure by Mélanie","","1870","Monthey","078 781 56 24","",0.0,81.0,256.0,"Actif"],
+["10410","112","Coiffure Alice Sàrl","","Coiffure Alice Sàrl","Av. de la Gare 42","1870","Monthey","024 471 10 75","",0.0,3078.0,3500.0,"VIP"],
+["28672","112","Dubosson","Céline","Dynamik Coiffure","avenue de France 9","1870","Monthey","078 841 11 09","",0.0,0.0,39.0,"Inactif"],
+["27576","112","Gidor Coiffure *","","Gidor Coiffure *","Avenue de la Gare 26","1870","Monthey","024 472 13 13","",0.0,1413.0,875.0,"Actif"],
+["25044","112","Leroy Bartholomé","Stéphanie","Act'ifs Coiffure","Place de l'Hôtel-de-Ville","1870","Monthey","024 471 39 81","079 837 34 17",0.0,1196.0,2386.0,"Actif"],
+["21177","112","Mateus","Suzie","Salon Prestige","Avenue de la Gare 24","1870","Monthey","024 471 07 74","",0.0,1016.0,298.0,"Actif"],
+["27559","112","May","Séverine","Le Salon de Mèche avec Vous","Avenue de France 9","1870","Monthey","024 472 40 41","",0.0,0.0,651.0,"Inactif"],
+["21143","112","Mujkic","Enissa","Salon Prestige","Av. de la Gare 24/Les Markets","1870","Monthey","024 471 07 74","079 417 97 01",0.0,128.0,166.0,"Actif"],
+["11736","112","Priscolio","Nath.","Coiffure","Rue Bourguignons 4","1870","Monthey","024 471 23 26","",0.0,373.0,819.0,"Actif"],
+["31498","102","Donnet","Constance","Constance Coiffure","Route du Simplon 21","1870","Monthey","079 634 85 89","",0.0,126.0,170.0,"Actif"],
+["31631","102","Flutra Sàrl Coiffure","","Flutra Sàrl Coiffure","Avenue de l'Europe 21","1870","Monthey","024 472 29 90","079 206 38 96",0.0,1055.0,44.0,"Actif"],
+["31738","102","Fracheboud","Annick","Coiffeuse chez Hella","Chemin du Levant  12","1870","Monthey","079 426 51 32","",0.0,555.0,0.0,"Actif"],
+["30869","102","Ledonne","Marguerite","Marguerite Coiffure","Rue de l'Eglise 8","1870","Monthey","077 488 18 39","",0.0,0.0,493.0,"Inactif"],
+["31775","102","Moumni","Ramzi","TAJ Barber Sàrl","Rue du Bourg-aux-Favres 1","1870","Monthey","078 261 02 64","",0.0,218.0,0.0,"Actif"],
+["31627","102","Sellimovski","Berat","Selimi Barber Shop","Rue du Coppet 4","1870","Monthey","078 658 19 96","",0.0,0.0,533.0,"Inactif"],
+["27482","112","Angéloz","Vânia","Fashion Coiffure","Place Tübingen 2","1870","Monthey","024 471 86 34","079 271 40 08",0.0,0.0,230.0,"Inactif"],
+["26252","112","Chesaux","Fabrice","Au travers d'une Odyssée","3, rue des Marmettes","1870","Monthey","024 471 84 71","",0.0,305.0,314.0,"Actif"],
+["23410","112","Dos Santos","Cidalia","Hairstyling by Cidalia Sàrl","Rue des Bourguignons 3","1870","Monthey","079 902 18 70","",0.0,1738.0,1234.0,"Actif"],
+["25015","112","Inderkummen","Sophie","Hollywood Coiffure","c/o Taj Barber","1870","Monthey","078 656 35 94","078 261 02 64",0.0,768.0,1111.0,"Actif"],
+["20197","112","Peralbo","Elisabeth","Design Coiffure","Rue Reconfière 1","1870","Monthey","024 471 43 42","079 521 00 83",0.0,1170.0,472.0,"Actif"],
+["20974","112","Viva","Monya","Coiffure Harmonia","2, avenue Crochetan","1870","Monthey","024 471 55 60","079 622 28 87",0.0,740.0,1114.0,"Actif"],
+["29777","112","Vuilleumier","Laetitia","Coiffure Laetitia","Avenue de France 25","1870","Monthey","079 352 98 38","",0.0,2500.0,2282.0,"VIP"],
+["31444","102","Bart","Assia","Dune Coiffure","Avenue des Alpes 41","1820","Montreux","021 512 12 24","078 662 28 95",0.0,0.0,353.0,"Inactif"],
+["31739","102","Grosdemange","Laura","Beauty Salon","Ruelle du Vuagnard 3","1820","Montreux","078 686 44 53","",0.0,396.0,0.0,"Actif"],
+["30486","102","Nguyen","Anitsa","Moon's Nails","Avenue des Alpes 17","1820","Montreux","078 953 95 92","078 853 59 26",0.0,0.0,131.0,"Inactif"],
+["31653","102","Piemontesi","Maeva","Maeva Coiffure","Avenue des Alpes 14","1820","Montreux","079 843 41 51","",0.0,168.0,0.0,"Actif"],
+["12018","102","Querol","Eleonor","Coiffure Querol","Rue de l'Eglise Catholique 12","1820","Montreux","021 963 02 06","079 827 69 53",0.0,0.0,163.0,"Inactif"],
+["30655","102","Ali","Rosim","Luxury Rosim Coiffure","Grand Rue 68","1820","Montreux","076 497 60 68","021 558 30 07",0.0,3440.0,2307.0,"VIP"],
+["31644","102","Bassotto","Angela","Hair Mania","Avenue des Alpes 1","1820","Montreux","021 963 22 46","",0.0,68.0,0.0,"Actif"],
+["31674","102","Berimon Sàrl","Béatrice","Coiffure Jean Louis David","Centre Commercial Le Forum","1820","Montreux","021 965 12 46","",0.0,4327.0,0.0,"VIP"],
+["30657","102","Bruchez","Loreta","Hairspa 42","Avenue du Casino 42","1820","Montreux","021 963 55 73","078 825 81 69",0.0,2441.0,2706.0,"VIP"],
+["30324","102","De Jesus","Santana","Alegria Coiffure","Avenue de Bellemont 13","1820","Montreux","076 504 91 21","021 963 44 40",0.0,142.0,185.0,"Actif"],
+["25289","102","Ferreira","Daniel","La Coiffure By Ferreira Daniel","Avenue Claude Nobs 14","1820","Montreux","021 963 13 00","",0.0,942.0,1548.0,"Actif"],
+["31657","102","Grasso","Salvatore","L'Atelier Coiffure","Avenue des Alpes 86","1820","Montreux","021 963 18 37","",0.0,2193.0,0.0,"VIP"],
+["23208","102","Heiniger","Thérèse","Coiffure La Passion de l'Hair","Rue de l'Eglise Catholique 11","1820","Montreux","021 963 06 26","076 378 09 91",0.0,1382.0,0.0,"Actif"],
+["21987","102","Lacapra","Lina","Atelier Coiffure Lina","3, rue du Marché","1820","Montreux","021 963 00 92","079 775 46 10",0.0,5037.0,4989.0,"VIP"],
+["31587","102","MMC Coiffure du Palace Sàrl","","MMC Coiffure du Palace Sàrl","Avenue Claude Nobs 2","1820","Montreux","021 963 09 63","079 724 49 76",0.0,894.0,341.0,"Actif"],
+["19329","102","Niclass","Sandra","Infini Coiffure Sandra","Avenue des Alpes 14","1820","Montreux","078 309 12 43","",0.0,1135.0,257.0,"Actif"],
+["26023","102","Tucev","Ruzica","Coiffure Le Monde de Lisa","Avenue des Alpes 94","1820","Montreux","021 963 11 79","",0.0,225.0,238.0,"Actif"],
+["30810","102","Ugrinovic","Bojana","My Day Beauty Lounge","Grand-Rue 98","1820","Montreux","078 934 44 52","",0.0,1137.0,772.0,"Actif"],
+["16266","102","Borloz","Maria","Coiffure Morgane","8, rue Grenade","1510","Moudon","021 905 26 22","",0.0,0.0,1509.0,"Inactif"],
+["27473","102","Lincoln","Jessica","Coiffure Ciseaux  1 2 3","Rue Grenade 17","1510","Moudon","021 905 34 86","079 755 01 00",0.0,0.0,91.0,"Inactif"],
+["17665","112","Trisconi","Giliane","Coiffure Infini-Tifs","Pré Géroux 2","1893","Muraz (Collombey)","079 283 33 11","024 472 74 71P",0.0,885.0,733.0,"Actif"],
+["20911","112","Aprile","Pamela","Pamela Coiffure","Ch. du Moulin 39","1893","Muraz (Collombey)","079 600 96 82","",0.0,5734.0,5726.0,"VIP"],
+["27822","112","Biolzi","Stephanie","Steph'Coiffure","1, chemin de la Millière","1893","Muraz (Collombey)","079 796 26 86","",0.0,508.0,747.0,"Actif"],
+["23265","102","De Luca","Daniela","Coiffure Daniela & Luca","Chemin du Lemont 31","1893","Muraz (Collombey)","","079 741 91 71",0.0,1608.0,503.0,"Actif"],
+["19581","112","Bond","Déborah","Coiffure Déborah","Rue de la Fraternité 18","3976","Noës","027 455 08 79","078 602 23 77",0.0,336.0,355.0,"Actif"],
+["31450","102","Hôtel de Ville d'Ollon","","Mme Audrey Freuten","Place Hotel de Ville 3","1867","Ollon VD","024 499 19 22","",0.0,0.0,183.0,"Inactif"],
+["28459","112","Bersier","Josette","Coiffure Joli Môme","3, Place du Cotterd","1867","Ollon VD","024 499 11 71","",0.0,0.0,306.0,"Inactif"],
+["11436","112","Brouze","Marlène","Sport Atmosph' Hair","Rue de la Tour 2","1867","Ollon VD","024 499 18 65","",0.0,0.0,482.0,"Inactif"],
+["13496","102","Buchs M.L. et Balmat P.","","Coiffure Elle et Lui","Le Bourg","1610","Oron-la-Ville","021 907 96 93","",0.0,366.0,186.0,"Actif"],
+["14542","102","Conne","Giovanna","Coiffure Influence","Centre Coop","1610","Oron-la-Ville","021 907 64 44","",0.0,399.0,0.0,"Actif"],
+["30664","102","Kevin Kayne Sàrl","","Coiffeur Créateur","Route de Lausanne 15","1610","Oron-la-Ville","021 991 70 84","",0.0,1074.0,0.0,"Actif"],
+["25656","102","Perret","Chantal","Chantal Coiffure","Chemin des Demi-Poses 12","1608","Oron-le-Châtel","079 332 77 67","021 907 22 05",0.0,449.0,322.0,"Actif"],
+["18497","112","Coelho Figueiredo","Nadia","Coiffure Chez Nadia","Place du Clocher 12","1937","Orsières","027 783 28 78","",0.0,0.0,346.0,"Inactif"],
+["31683","102","Reis","Diana","Coiffeuse","Chemin de l'Orée des Bois 2","1607","Palézieux-Village","079 694 27 10","",0.0,362.0,0.0,"Actif"],
+["25143","102","Leone","Giulia","Giulia Coiffure","24, rue du Simplon","1094","Paudex","021 791 27 82","079 453 46 92",0.0,113.0,485.0,"Actif"],
+["22102","112","Rebelo","Inès","Coiffure Rebel Style","Route de Savoie 101A","1962","Pont-de-la-Morge (Sion)","079 732 31 60","",0.0,0.0,396.0,"Inactif"],
+["25629","102","Python","Catherine","Coiffeuse","Rte de la Glâne 120","1677","Prez-vers-Siviriez","026 656 11 29","079 425 47 59",0.0,1252.0,1117.0,"Actif"],
+["30096","102","Léone","Michel","Planet Hair Coiffure - Styling","Route de Cossonay 13","1008","Prilly","021 624 83 06","",0.0,429.0,0.0,"Actif"],
+["28174","102","Mendonça","Carla","Alisé Coiffure","Rue des Métiers 4","1008","Prilly","","076 524 50 64",0.0,1396.0,1697.0,"Actif"],
+["27182","102","SK Groupe Sàrl","","Salon de Coiffure Yona","Chemin du Viaduc 1","1008","Prilly","021 625 10 20","079 344 98 84",0.0,1010.0,2264.0,"Actif"],
+["18855","102","Spicher","Arlette","Coiffeuse","Route du Village 46","1070","Puidoux","079 641 38 84","",0.0,0.0,11.0,"Inactif"],
+["19810","102","Atmosp'hair Sàrl","","Madame Rita Celia","73, chemin des Osches","1009","Pully","021 728 37 38","079 689 63 68",0.0,1383.0,2033.0,"Actif"],
+["27023","102","Dessange Paris","","Salon de Coiffure","2, rue de la Poste","1009","Pully","021 711 00 70","",0.0,524.0,391.0,"Actif"],
+["13753","102","Helou","Antoine","Coiffeur Visagiste","Rue Verdaine 4","1009","Pully","021 729 71 00","",0.0,621.0,692.0,"Actif"],
+["31425","102","Bieri","Yann","Coiffeur","74, avenue Général Guisan","1009","Pully","0787 635 11 18","",0.0,0.0,168.0,"Inactif"],
+["31788","102","Pascale","Marie-Isabelle","Coiffeuse","Route du Tombec 38","3966","Réchy","078 675 11 08","027 455 63 53",0.0,194.0,0.0,"Actif"],
+["31168","102","Gjonaj","Shqipe","SG Institut","Rue du Village 5","1020","Renens VD","079 859 83 28","021 634 49 94",0.0,125.0,338.0,"Actif"],
+["24015","102","Demiri","Miradie","Coiffure Ad'mira'tif","24, avenue de la poste","1020","Renens VD","021 634 23 60","076 349 93 10",0.0,352.0,323.0,"Actif"],
+["24385","102","Dias","Olga","Coiffure O'Zen","Av. de la Poste 14","1020","Renens VD","021 634 50 32","",0.0,158.0,38.0,"Actif"],
+["17849","102","Kv coiffure Sàrl","","Salon de coiffure Kramer","4, place de la Gare","1020","Renens VD","021 634 35 28","",0.0,1704.0,742.0,"Actif"],
+["31514","102","Morina","Brenda","Studio Brenda","Rue du Marais 9","1020","Renens VD","079 568 90 58","",0.0,0.0,151.0,"Inactif"],
+["24968","102","Prince","Adjovi","Coiffure Adjovi","Chemin des Jonquilles 6","1020","Renens VD","078 602 99 39","",0.0,555.0,0.0,"Actif"],
+["10608","102","Emmanuel","Yolande","Coiffeuse","Chemin de Corbettes 5","1020","Renens VD","021 634 49 94","",0.0,404.0,833.0,"Actif"],
+["31519","102","Sari","Helin","Nile Wellness & Hair","Place du Marché 1","1020","Renens VD","079 152 54 95","",0.0,961.0,452.0,"Actif"],
+["30908","112","Ramos Dos Santos","Vera","Flor Coiffure","26, avenue de Florissant","1020","Renens VD","021 625 23 72","078 631 50 90",0.0,0.0,287.0,"Inactif"],
+["14297","112","Coppex-Buchard","Patricia","Coiffure Diminu'tifs Sàrl","Route du Village 16","1908","Riddes","027 306 12 41","",0.0,3716.0,2844.0,"VIP"],
+["30793","112","Lemos","Carla","LCN Coiffure","Rue du Village 22","1908","Riddes","078 676 18 56","",0.0,889.0,209.0,"Actif"],
+["31580","102","Aymon","Julie","Coiffeuse","Rue des Courtenaux 3","1908","Riddes","076 298 19 16","",0.0,0.0,97.0,"Inactif"],
+["30459","112","Merovci","Liridona","Donaa Coiffure & Esthétique","Centre Com. Shopping Roche","1852","Roche VD","021 968 12 10","079 608 53 38",0.0,3999.0,2651.0,"VIP"],
+["31686","102","Dos Santos Gaspar","Paula","Coiffeuse","Grand Rue 23","1680","Romont FR","077 269 79 29","",0.0,153.0,0.0,"Actif"],
+["13336","102","Perret","Christine","Adiante Coiffure","71, route de Sautes","1913","Saillon","","",0.0,0.0,800.0,"Inactif"],
+["29946","112","De Boni","Sonia","Coiffure Neptune","Les Bains de Saillon","1913","Saillon","027 744 27 41","",0.0,402.0,201.0,"Actif"],
+["29737","112","Batista","Paula","Hair Style Coiffure","Route du Vieux Pont 7","1913","Saillon","078 888 38 64","",0.0,3739.0,4046.0,"VIP"],
+["21105","112","Praz","Cynthia","Coiffure Oxygène","Chemin du Midi 4","1913","Saillon","027 744 41 44","",0.0,1224.0,1350.0,"Actif"],
+["30726","102","Lambrigger","Jenny","Salon Créatifs","Gemmistrasse 65","3970","Salgesch","027 455 92 93","078 600 92 93",0.0,1532.0,0.0,"Actif"],
+["19526","112","Jacquier","Gaby","Coiffure Chez Gaby","St-Germain","1965","Savièse","027 395 12 86","",0.0,1391.0,1566.0,"Actif"],
+["31586","112","Gabel","Lauriane","Coiffeuse","45, rue de Plandodin","1965","Savièse Distribution","079 922 94 16","",0.0,0.0,106.0,"Inactif"],
+["31484","102","Coiffure Les Sources","","Tertianum","Route du Léman 27","1907","Saxon","027 611 24 00","078 913 07 85",0.0,0.0,661.0,"Inactif"],
+["31452","102","Da Costa","Isabelle","Isab.hair","Isab.hair","1907","Saxon","077 400 98 14","",0.0,1706.0,263.0,"Actif"],
+["30178","112","Asdren","Tetaj","Coiffeur Barbier VIP DRENI","Route du Village 1","1907","Saxon","079 763 02 04","",0.0,341.0,611.0,"Actif"],
+["20057","112","Crettenand-Gay","Joëlle","Idée'Coiff","Rue de la Toule 42","1907","Saxon","079 279 02 19","",0.0,0.0,167.0,"Inactif"],
+["27921","112","Mari-Carrupt","Erica","Salon de la Gare","Place de la Révolte 3","1907","Saxon","027 744 13 52","079 632 56 44",0.0,194.0,178.0,"Actif"],
+["31490","102","Taramarcaz","Vanessa","Coiffeuse","Route du Leman 36","1907","Saxon","079 535 86 20","",0.0,0.0,313.0,"Inactif"],
+["31489","102","Ricardo","Jessica","Bahia Coiffure","Rue Principale 39","1933","Sembrancher","079 365 22 62","079 833 52 86",0.0,0.0,171.0,"Inactif"],
+["25385","112","May","Lisiane","Armony Coiffure","C.C. Coop/Route des Parties 20","1933","Sembrancher","027 565 24 49","",0.0,821.0,906.0,"Actif"],
+["18532","102","Maurer","Francine","Coiffure Francine","Chemin du Théâtre 5","1077","Servion","021 903 22 54","",0.0,2475.0,1890.0,"VIP"],
+["30839","102","Rodrigues","Ivo","RS Barbershop","Route de Sion 8","3960","Sierre","076 709 14 47","076 767 04 87",0.0,581.0,154.0,"Actif"],
+["31662","112","Bigoni","Sara","Coiffure","Avenue des Platanes 15A","3960","Sierre","076 787 01 25","",0.0,149.0,0.0,"Actif"],
+["18788","112","Huter","Marylène","Coiffure Marylène","Rue de Villa 1","3960","Sierre","027 455 85 53","",0.0,97.0,0.0,"Actif"],
+["20199","112","Madelaine","Guillaume","Coiffure","2, avenue Mercier-de-Molin","3960","Sierre","027 455 67 39","",0.0,46.0,0.0,"Actif"],
+["31048","112","Moret","Malika","Malika Moret Coiffure","Rue de Lamberson 14","3960","Sierre","079 787 23 11","",0.0,422.0,57.0,"Actif"],
+["31658","102","Barone","Alexandro","Coiffeur","Chemin du Repos 1b","3960","Sierre","076 842 22 09","",0.0,458.0,0.0,"Actif"],
+["31764","102","De Jesus Gaspar","Cecilia","Coiffeuse","Avenue des Alpes 22","3960","Sierre","077 810 73 83","",0.0,189.0,0.0,"Actif"],
+["31761","102","Loretan","Frank","Coiffeur","Avenue du Rothorn 5","3960","Sierre","079 912 61 15","027 455 67 27",0.0,318.0,0.0,"Actif"],
+["27942","112","Steiner","Anna","Salon Aux Petits Soins","Rue du Stand 2a","3960","Sierre","","078 243 24 96",0.0,97.0,295.0,"Actif"],
+["15430","112","Valles A. & Attanasio L.","","Coiffure Vital's","4, rue de l'Hôpital","3960","Sierre","027 456 42 48","",0.0,148.0,0.0,"Actif"],
+["30951","112","Gidor AG*","","Gidor Coiffure","Avenue du Général-Guisan 14","3960","Sierre","027 456 51 50","",0.0,105.0,0.0,"Actif"],
+["31630","102","Ledo Estevez","Rafael","La Boîte de Pandore","Route de l'Hôpital 3","3960","Sierre","078 211 84 39","",0.0,941.0,164.0,"Actif"],
+["30921","102","Palumbo","Antonietta","Création Coiffure","Av. Mercier-de-Molin 3","3960","Sierre","027 456 30 96","",0.0,2101.0,0.0,"VIP"],
+["31620","102","Sido","Lorenzo","Beauty Art's Lorenzo","Rue d'Orzival 22","3960","Sierre","078 257 16 90","",0.0,950.0,287.0,"Actif"],
+["30979","112","Amato","Dominique","Chez Domé Coiffure","Rue du Stade 4A","3960","Sierre","078 895 48 71","",0.0,186.0,591.0,"Actif"],
+["27620","112","Epiney","Colette","c/o Salon A Vos Tifs","Av. Rothorn 9A/Imm La Terrasse","3960","Sierre","078 659 78 19","027 455 41 14",0.0,516.0,825.0,"Actif"],
+["28301","112","Foti","Tina","Coiffure Vidômes","Rue du Bourg 27","3960","Sierre","027 455 13 04","",0.0,1933.0,1065.0,"Actif"],
+["24559","112","In-Albon","Véronique","Salon A Vos Tifs","Av. Rothorn 9A/Imm La Terrasse","3960","Sierre","027 455 41 14","078 601 02 87",0.0,4041.0,4287.0,"VIP"],
+["28595","112","Marino","Stefania","Stefania Coiffure","Rue D'Orzival 18","3960","Sierre","027 455 49 46","079 738 27 40",0.0,285.0,233.0,"Actif"],
+["30445","112","Kadriji","Albina","Coiffeuse","Route de Sion 93","3960","Sierre","079 269 45 67","",0.0,0.0,352.0,"Inactif"],
+["16607","112","Salamin","Muriel","Institut Capillaire Salamin","Avenue de France 43","3960","Sierre","027 455 18 67","078 801 80 67",0.0,375.0,1162.0,"Actif"],
+["18527","112","Sido","Brigitte","Coiffure Femina","22, rue d'Orzival","3960","Sierre","078 626 70 86","078 250 13 65",0.0,398.0,1029.0,"Actif"],
+["31172","102","Andreic","Durdica","Coiffure SI-HAIR","Route du Simplon 38","3960","Sierre","027 451 90 60","",0.0,1507.0,680.0,"Actif"],
+["23516","112","Berset","Caroline","Coiffure Courant d'Hair","Route de Sion 26","3960","Sierre","027 456 22 54","079 601 64 77",0.0,0.0,369.0,"Inactif"],
+["30048","112","Boukar","Ahmed","Coiffure Baraka","Route de Sion 39","3960","Sierre","078 756 76 48","",0.0,569.0,1021.0,"Actif"],
+["10775","112","Briguet","Myriam","Coiffure Les Ciseaux d'Or","38, rte du Simplon","3960","Sierre","027 455 66 57","078 834 81 05",0.0,1873.0,1252.0,"Actif"],
+["17925","112","Cappelle","Ingrid","Coiffure Dynamite","41, rue du Bourg","3960","Sierre","027 456 77 00","078 615 77 00 Privé",0.0,1107.0,1199.0,"Actif"],
+["20265","112","De Gobbi L. & Quoëx M.","","Coiffure Scandale","Rue de la Tservetta 20","3960","Sierre","027 455 03 03","",0.0,362.0,0.0,"Actif"],
+["23460","112","Faliti","Tina","Art & Coiffure Chez Tina","18, avenue des Alpes","3960","Sierre","027 455 00 77","078 667 53 32",0.0,3004.0,2461.0,"VIP"],
+["20266","112","Glassey","Marielle","Coiffure Oasis","2, rue Beausite","3960","Sierre","078 659 78 19","079 310 86 54",0.0,0.0,213.0,"Inactif"],
+["29738","112","Mayor","Barbara","Coiffure New Styl'Vogue","5, ave du Rothorn","3960","Sierre","027 455 67 27","079 853 44 17",0.0,643.0,645.0,"Actif"],
+["23078","112","Miranda","Katia","Coiffure Katia","Lamberson 14","3960","Sierre","027 456 26 80","079 256 01 45",0.0,107.0,0.0,"Actif"],
+["31317","112","Rapp","Fabien","Kraemer Paris","13, avenue du Général-Guisan","3960","Sierre","027 456 54 54","",0.0,323.0,1077.0,"Actif"],
+["29944","112","Zen","Mirna","L'Atelier de Coiffure","avenue de France 41","3960","Sierre","027 455 00 45","079 773 28 34",0.0,1432.0,2431.0,"Actif"],
+["31448","102","Alan","Ahmed","Ahmed Barber-Shop","Avenue de la Gare 17b","1950","Sion","079 955 43 71","",0.0,167.0,291.0,"Actif"],
+["31359","102","Ferreira Marques","Katy","c/o Magic Beauty","Chemin du Vieux Canal 39","1950","Sion","076 549 45 39","",0.0,0.0,42.0,"Inactif"],
+["31147","102","Jordan","Régine","Coiffure & Onglerie AR Beauty","Avenue de la Gare 9","1950","Sion","027 304 59 49","078 948 23 05",0.0,177.0,98.0,"Actif"],
+["23396","102","Panchard","Nicole","Coiffure Colormania","Rue de Conthey 2","1950","Sion","027 323 55 95","",0.0,0.0,10.0,"Inactif"],
+["30559","102","Pfaffen","Corinne","Corinne Coiffure","Avenue de Tourbillon 59","1950","Sion","079 577 07 68","",0.0,0.0,66.0,"Inactif"],
+["31486","102","Ibrahim","Hevin","Coiffeuse","Rue de la Blancherie 15","1950","Sion","079 328 29 91","",0.0,0.0,140.0,"Inactif"],
+["31260","102","Ricciardi","Antonio","Le Barbier chez Antonio","Rue du Scex 14","1950","Sion","078 912 87 57","",0.0,647.0,0.0,"Actif"],
+["16632","112","Balet","Christianne","Coiffure dames Salon Elysée","8, rue des Creusets","1950","Sion","027 322 21 35","079 236 86 91",0.0,3264.0,1420.0,"VIP"],
+["19774","112","Bourquin","Emmanuelle","Coiffure Emmanuelle","25, avenue de la Gare","1950","Sion","027 322 55 40","",0.0,0.0,63.0,"Inactif"],
+["24793","112","Gaeta","Lise","Coiffure Personna'lise","Rue du Scex 49","1950","Sion","027 321 14 89","079 334 67 69",0.0,1133.0,1607.0,"Actif"],
+["16651","112","Gidor Coiffure AG *","","Centre Commercial Porte-Neuve","Rue de la Porte-Neuve 21","1950","Sion","027 323 81 70","",0.0,723.0,2051.0,"Actif"],
+["11549","112","Pannatier","Paul","Coiffure","25, ave de la Gare","1950","Sion","027 322 12 74","",0.0,0.0,105.0,"Inactif"],
+["21386","102","Barmaz","Nicole","Coiffure Nicole","Avenue du Bietschhorn 37","1950","Sion","079 408 98 62","",0.0,894.0,0.0,"Actif"],
+["30141","112","Chilinski","Daphné","Coiffure La Grande Daphné","Rue Supersaxo 5","1950","Sion","076 467 11 92","",0.0,831.0,460.0,"Actif"],
+["22165","102","Duarte","Catia","Coiffure Adam & Eve","31, avenue du Ritz","1950","Sion","027 323 79 33","078 911 24 14",0.0,0.0,177.0,"Inactif"],
+["31156","102","Hofer","Sébastien","Coiffure Mise en Scène","Avenue de la Gare 31","1950","Sion","027 321 32 22","",0.0,0.0,979.0,"Inactif"],
+["21490","102","Meloni","Sonia","Dissemblance Coiffure","Rue des Vergers 6","1950","Sion","027 322 44 06","078 623 52 71",0.0,0.0,65.0,"Inactif"],
+["30382","102","Perira","Kristina","Coiffure Le Look","Avenue du Petit Chasseur 92","1950","Sion","076 500 31 22","",0.0,302.0,748.0,"Actif"],
+["21269","112","Délétroz","Fabienne","Tendance Coiffure","Av. Pratifori 10","1950","Sion","027 322 34 04","079 233 40 78",0.0,876.0,736.0,"Actif"],
+["23735","112","Monticelli","Nathalie","Salon 'Un temps pour soi'","Rue de la Dixence 23","1950","Sion","027 321 20 27","079 730 32 82",0.0,4188.0,2935.0,"VIP"],
+["26593","112","Ribeiro","Jessica","JR Coiffure","Rue du Vieux-Canal 39","1950","Sion","078 865 77 55","",0.0,470.0,588.0,"Actif"],
+["28126","112","Toma Mattar","Géraldine","Géraldine Hair Spa","Place du Midi 30","1950","Sion","079 653 04 51","",0.0,145.0,213.0,"Actif"],
+["27551","112","Vieira","Claudia","Carmelo Coiffure","Rue de la Blancherie 35","1950","Sion","027 322 36 50","",0.0,1343.0,1200.0,"Actif"],
+["31655","102","Constantin","Morgane","Evolution Coiffure MC","44, route de Vissigen","1950","Sion","027 203 64 31","079 612 87 03",0.0,3259.0,0.0,"VIP"],
+["31624","102","Araujo","Cristina","L'Appartement Coiffure","Rue du Rhône 4","1950","Sion","027 322 18 78","078 616 13 55",0.0,2525.0,2274.0,"VIP"],
+["30932","102","Blanco","Andréa","Lissaline Coiffure","Rue des Aubépines 9","1950","Sion","079 717 13 75","",0.0,302.0,549.0,"Actif"],
+["30824","102","Capone","Margot","c/o Coiffure Nouvel Hair","Grand-Pont 11","1950","Sion","078 670 12 27","",0.0,14.0,0.0,"Actif"],
+["30834","102","Casari","Thomas","Tomtom's Barbershop SARL","Route de la Drague 18","1950","Sion","079 339 65 77","",0.0,1479.0,1272.0,"Actif"],
+["31727","102","Del Rio","Samantha","Alcala Coiffure Sàrl","Avenue de la Gare 15","1950","Sion","027 543 30 68","079 584 43 71",0.0,282.0,0.0,"Actif"],
+["31161","102","Jashari","Suzana","D'S Coiffure","Rue des Casernes 18","1950","Sion","079 518 38 98","079 822 36 80",0.0,406.0,435.0,"Actif"],
+["31220","102","Melo","Luis","J.L. Barbier Coiffure","Rue des Casernes 18","1950","Sion","078 743 40 75","",0.0,561.0,0.0,"Actif"],
+["31669","102","Nouvel Hair","","Salon de Coiffure","Rue du Grand Pont 11","1950","Sion","027 322 93 71","",0.0,15.0,0.0,"Actif"],
+["31535","102","Piquet","Stéphane","Stan Styliste Créateur Sàrl","Avenue de la Gare 25","1950","Sion","079 439 81 93","",0.0,660.0,467.0,"Actif"],
+["31676","102","Regamey","Patrick","c/o Le Temps d'un Barbier","avenue de la Gare 24","1950","Sion","027 322 18 24","",0.0,1383.0,0.0,"Actif"],
+["30190","112","Assaltubio","Gwendoline","c/o Le Temps d'un Barbier","avenue de la Gare 24","1950","Sion","079 195 76 12","027 322 18 24",0.0,218.0,0.0,"Actif"],
+["12464","112","Bérard","Jacques Roland","Salon Français & Fabystyle","Rue de Pré-Fleuri 2A","1950","Sion","027 322 58 78","079 683 49 05",0.0,201.0,96.0,"Actif"],
+["14294","112","Cacciatore","Giovanni","Coiffure Milady","Rue de Savièse 1","1950","Sion","027 322 24 13","",0.0,2913.0,626.0,"VIP"],
+["30663","112","Pessoa","Sofia","Coiffeuse","Rue des Casernes 65","1950","Sion","079 479 02 05","",0.0,68.0,72.0,"Actif"],
+["20472","112","Campo","Raffaella","Salon N.K.R.","9, place du Scex","1950","Sion","078 623 68 16","027 322 16 00",0.0,1658.0,1200.0,"Actif"],
+["13249","112","Castella","Maïté","Coiffure Akimbo","54, route du Manège","1950","Sion","027 203 69 70","",0.0,6174.0,3152.0,"VIP"],
+["29941","112","Chin Carvoeiro","Stéphanie","Couleur d'Ebène","Rue du Pré-Fleuri 2B","1950","Sion","079 482 56 72","075 421 98 10",0.0,241.0,0.0,"Actif"],
+["28549","112","Coiffure Touche Finale Sàrl","","Madame Vincenti Maria","Galeries 3/C.C. Portes-Neuves","1950","Sion","027 321 38 38","",0.0,173.0,341.0,"Actif"],
+["20521","112","De Sousa","Antonio","Coiffure ADS","Rue Porte-Neuve 23","1950","Sion","027 322 33 33","",0.0,514.0,1084.0,"Actif"],
+["25913","112","Ferreira","Marisa","Coiffure Myst'hair","Grand-Pont 21","1950","Sion","076 223 87 67","",0.0,74.0,32.0,"Actif"],
+["30137","112","Fournier","Inès","Coiffure Inès","Rue du Grand-Pont 16","1950","Sion","077 488 08 77","027 322 05 20",0.0,1183.0,1495.0,"Actif"],
+["12137","112","Giudice","Alfonso","Alfonso Coiffure","Rue du Scex 33","1950","Sion","079 417 33 07","",0.0,351.0,93.0,"Actif"],
+["18248","112","Giudice","Yvan","Coiffure Feeling","33, rue du Scex","1950","Sion","027 323 81 68","079 401 78 33",0.0,510.0,0.0,"Actif"],
+["20065","112","Rao","Nunzia","Coiffure Art Line","Rue Pré-Fleuri 2A","1950","Sion","027 321 30 77","",0.0,417.0,138.0,"Actif"],
+["24035","112","Rive Gauche SARL","","Coiffure","Rue de la Dent-Blanche 18","1950","Sion","027 323 33 23","",0.0,3238.0,0.0,"VIP"],
+["20278","112","Sonzogni","Pascale","Pascale Coiffure - Maquillage","Grand-Pont 2, 1er étage","1950","Sion","027 322 54 54","",0.0,907.0,588.0,"Actif"],
+["31200","112","Torner","Patrick","c/o Le Temps d'un Barbier","Avenue de la Gare 24","1950","Sion","027 322 18 24","077 427 14 48",0.0,0.0,75.0,"Inactif"],
+["26508","112","Vidal","Frédéric","Le Temps d'un Barbier","avenue de la Gare 24","1950","Sion","027 322 18 24","079 107 37 54",0.0,3783.0,981.0,"VIP"],
+["29751","112","Vuignier","Esther","Coiffure Personna'lise","Rue du Scex 49","1950","Sion","027 321 14 89","079 135 36 16",0.0,369.0,471.0,"Actif"],
+["24800","102","Butty","Mireille","Le Studio","Route de Romont 48","1678","Siviriez","","079 475 07 68",0.0,1492.0,0.0,"Actif"],
+["20131","102","Chassot","Marianne","Athena Coiffure","Route de Brenles 77","1678","Siviriez","078 644 06 87","",0.0,57.0,80.0,"Actif"],
+["31441","102","Imboden","Marilyn","Coiffeuse","Rittingen 132","3924","St. Niklaus VS","079 206 71 65","",0.0,0.0,228.0,"Inactif"],
+["24037","102","Capt","Marcel","Capt Marcel","Chemin des Noisetiers 14a","1264","St-Cergue","079 378 87 41","079 696 34 70",0.0,221.0,208.0,"Actif"],
+["18479","102","Zentner","Chantal","Coiffure Art de Plaire","51B, route des Deux-Villages","1806","St-Légier-Chiésaz","021 943 74 44","",0.0,843.0,977.0,"Actif"],
+["22310","112","Nigra","Marina","La Tiffolia","Avenue du Simplon 8","1890","St-Maurice","","079 201 58 89",0.0,339.0,490.0,"Actif"],
+["29728","112","Zermatten","Valérie","Coiffure Le Carré","Avenue des Terreaux 21","1890","St-Maurice","024 485 12 91","",0.0,254.0,756.0,"Actif"],
+["19375","102","Zamboni-Raboud","Karine","Coiffure à domicile","Route du Pas 35","1872","Troistorrents","079 623 44 50","",0.0,0.0,615.0,"Inactif"],
+["21509","112","Berrut","Claudia","Le Salon","Place du Village 28","1872","Troistorrents","079 697 81 38","",0.0,276.0,465.0,"Actif"],
+["27388","112","Mariaux","Christelle","Coiffure Pause Salon","Place du Village 18","1872","Troistorrents","079 551 05 14","",0.0,0.0,278.0,"Inactif"],
+["24042","102","Deschenaux","Virginie","Artifice Coiffure","5, route de Vauderens","1670","Ursy","021 909 51 39","078 831 84 00",0.0,2842.0,1976.0,"VIP"],
+["21683","102","Magnin","Marilyne","Evolutifs Coiffure","Chemin du Soleil 3","1670","Ursy","021 909 59 68","",0.0,4227.0,3915.0,"VIP"],
+["31208","102","Telley","Nathalie","Styl'Coiffure","Route de Moudon 1","1670","Ursy","021 909 03 23","079 122 86 57",0.0,5685.0,4056.0,"VIP"],
+["27254","112","Donnet","Laurence","Coiffeuse","Route de la Plaine 37a","1958","Uvrier","027 321 30 44","078 606 02 05",0.0,1666.0,1628.0,"Actif"],
+["31724","102","Barbuto-Bornet Anaïs","Anaïs","Authentic by Anaïs","Route d'Italie 152","1958","Uvrier","079 279 98 50","",0.0,912.0,0.0,"Actif"],
+["31635","102","Schwery","Jéromie","Jéromie Coiffure","Route des Joncs 103","1958","Uvrier","079 740 22 08","",0.0,3555.0,0.0,"VIP"],
+["31058","112","Rey-Mermet","Sandra","Le K-Rey Coiffure","Route de la Vallée 32","1873","Val-d'Illiez","024 477 20 46","079 341 88 49",0.0,828.0,770.0,"Actif"],
+["31530","102","Parois","Aurélien","Coiffeur","Crêta-Co 11","1936","Verbier","00336 45 98 21 14","",0.0,0.0,373.0,"Inactif"],
+["31796","102","Catanéo","Jean Daniel","Les Cytises Coiffure","Rue du Centre Sportif 1","1936","Verbier","027 771 43 20","",0.0,318.0,0.0,"Actif"],
+["31387","102","Parois","Aurélien","c/o Pharmacie Internationale","Studio 4 Salon de Coiffure","1936","Verbier","027 556 08 51","",0.0,0.0,858.0,"Inactif"],
+["21188","112","Correia","Sonia","Coiffure","30, avenue de la Gare","1963","Vétroz","079 644 22 37","",0.0,0.0,2125.0,"Inactif"],
+["24047","112","Zwintfer","Dora","Coiffure à domicile Dora","Route du Stade 2","1963","Vétroz","079 281 06 19","",0.0,812.0,869.0,"Actif"],
+["30639","102","Giannini","Liliane","Coiffure Le Look","Rue du Pont 17","1963","Vétroz","027 323 71 81","",0.0,354.0,422.0,"Actif"],
+["23943","112","Carron","Liliane","La Boîte à coupe","20, avenue des Vergers","1963","Vétroz","027 346 36 64","078 858 20 42",0.0,5225.0,5401.0,"VIP"],
+["27496","112","Cilurso","Maria","Look Addiction","Av. de Derborence 11","1963","Vétroz","079 206 98 72","027 346 90 63",0.0,0.0,229.0,"Inactif"],
+["30069","112","Claivoz","Océane-Lee","Coiffure Océane-Lee","Route de la Meunière 6","1963","Vétroz","079 595 25 58","",0.0,134.0,482.0,"Actif"],
+["30468","112","Frederico Gabriel","Isabel","Coiffure l'Atelier","Route Cantonale 125","1963","Vétroz","078 766 08 86","",0.0,1631.0,2534.0,"Actif"],
+["31471","102","Bordin","Aurélia","L'arte Coiffure","14, avenue Paul-Cérésole","1800","Vevey","079 138 71 60","",0.0,261.0,485.0,"Inactif"],
+["30529","102","D'Angelo","Sabrina","Diamant Centre de Beauté","Rue des Tilleuls 2","1800","Vevey","021 922 81 97","078 678 75 76",0.0,511.0,495.0,"Actif"],
+["31296","102","Duarte","Carmina","Coiffure Carmina","Rue du Clos 22","1800","Vevey","021 922 38 17","",0.0,0.0,323.0,"Inactif"],
+["28214","102","Scheuner","Sylvie","Lys Coiffure","Rue du Conseil 19","1800","Vevey","021 921 66 21","079 705 69 52",0.0,222.0,257.0,"Actif"],
+["31792","102","Wicht","Nathalie","Le Grand Salon","Rue de Hôtel-de-Ville 13","1800","Vevey","079 478 86 80","024 494 18 00",0.0,3047.0,0.0,"VIP"],
+["31037","102","Bourdais","Murielle","Rituel Hair Studio","Rue des Deux Marchés 8","1800","Vevey","021 921 36 80","076 789 01 85",0.0,243.0,632.0,"Actif"],
+["20718","102","Buchs","Véronique","La Coifferie","rue des Deux-Marchés 27","1800","Vevey","021 922 27 51","076 436 00 23",0.0,2965.0,2566.0,"VIP"],
+["22330","102","Coimbra","Emilie","Coiffure L'As de Trèfle","23 rue du Midi","1800","Vevey","021 921 67 43","076 321 28 85",0.0,910.0,961.0,"Actif"],
+["31774","102","Curcio","Alexandra","Salon les deux Elles","Rue du Simplon 5","1800","Vevey","078 759 74 49","021 921 39 48",0.0,585.0,0.0,"Actif"],
+["31491","102","Damjanovic","Marijana","Beauty World","4, avenue Reller","1800","Vevey","079 558 69 59","",1.0,1076.0,393.0,"Actif"],
+["30503","102","D'Innocenzo","Debora","Coiffure Debora","Rue du Léman 12","1800","Vevey","078 950 42 50","",0.0,771.0,1169.0,"Actif"],
+["16622","102","Dragone","Sara","Coiffure Pastelle","Rue d'Italie 13","1800","Vevey","021 921 56 57","",0.0,756.0,0.0,"Actif"],
+["29433","102","Julia B","","Julia B","Rue du Lac 28","1800","Vevey","021 922 21 21","079 231 69 28",0.0,383.0,0.0,"Actif"],
+["14364","102","Fiorenza","Gérard","Coiffure Gérard","26, rue d'Italie","1800","Vevey","021 921 53 61","",0.0,1966.0,980.0,"Actif"],
+["23469","102","Gonzalez","Carmen","Coiffure Gema","avenue Général Guisan 41","1800","Vevey","021 921 51 70","",0.0,0.0,899.0,"Inactif"],
+["13310","102","Melileo","Maria","Coiffure Domino","9, rue du Conseil","1800","Vevey","021 921 52 80","079 394 46 08",0.0,1923.0,506.0,"Actif"],
+["14389","102","Sauvonnet","Jacques","Coiffure Artifs","51, bld Arcangier","1800","Vevey","021 944 56 92","",0.0,569.0,141.0,"Actif"],
+["31504","102","Tête à Clack Sàrl","","Salon de Coiffure","Rue du Centre 8","1800","Vevey","021 921 17 79","021 931 60 80",0.0,833.0,3467.0,"Actif"],
+["31769","102","Ferreira","Anabela","Coiffeuse","Rue Oscar Monay 24B","3968","Veyras","079 336 70 47","",0.0,74.0,0.0,"Actif"],
+["30968","102","Pellissier","Vanessa","Vaness Coiffure","Avenue St-François 1","3968","Veyras","027 455 16 09","",0.0,1035.0,0.0,"Actif"],
+["26469","102","Favre","Elodie","Evasion Coiffure","Route de Chardonnay 1","1061","Villars-Mendraz","079 855 85 88","021 903 45 46",0.0,285.0,0.0,"Actif"],
+["11836","112","Da Campo","Vincent","Coiffure Vincent","4, Grand-Rue","1844","Villeneuve","021 960 24 24","",0.0,465.0,324.0,"Actif"],
+["15487","112","Viret","Véronique","Coiffure Eden","57, Grand-Rue","1844","Villeneuve","021 968 23 28","",0.0,0.0,129.0,"Inactif"],
+["31618","102","Richard","Valérie","Salon Oser F'Hair","Grande Rue 92","1844","Villeneuve VD","078 801 68 59","",0.0,1503.0,684.0,"Actif"],
+["30826","102","Schütz","Delphine","Atelier des Fées","Grand-Rue 69","1844","Villeneuve VD","079 230 09 25","",0.0,0.0,379.0,"Inactif"],
+["29958","112","Aulaiman","Alan","Elégance Barber Shop","Grand-Rue 17","1844","Villeneuve VD","021 968 12 31","079 104 92 38",0.0,29.0,739.0,"Actif"],
+["31601","112","Veillon","Julia","La Coiffure Holistique","Grand-Rue 52","1844","Villeneuve VD","021 960 10 14","078 818 69 33",0.0,515.0,421.0,"Actif"],
+["31701","102","Darbellay","Juliane","Color'Tiff","Chemin du Bisse 10","1941","Vollèges","079 778 31 21","",0.0,497.0,0.0,"Actif"],
+["31610","102","Rizzo","Jessica","Coiffure Emeraude","Avenue de Savoie 4","1896","Vouvry","024 481 41 80","077 424 01 23",0.0,709.0,57.0,"Actif"],
+["20004","112","Pignat","Chrystel","Impact' Coiffure","Grand Rue 14","1896","Vouvry","024 481 11 94","",0.0,351.0,0.0,"Actif"],
+["28302","102","Piot","Othilie","Zen'it Coiffure","Grand'Rue 6","1462","Yvonand","079 215 88 16","",0.0,0.0,143.0,"Inactif"]
+];
+</script></body></html>
