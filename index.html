@@ -153,6 +153,21 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 /* INFO GRID */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .info-item{background:var(--slate4);border-radius:var(--r-sm);padding:9px 11px}
+.hor-week{display:flex;gap:4px;margin-top:8px;flex-wrap:wrap}
+.hor-badge{flex:1;min-width:34px;text-align:center;padding:6px 2px;border-radius:var(--r-sm);font-size:10px;font-weight:700;background:var(--slate3);color:var(--slate2)}
+.hor-badge.open{background:var(--sage3);color:var(--sage)}
+.hor-badge.today{outline:2px solid var(--navy3);outline-offset:1px}
+.hor-status{font-size:13px;font-weight:700;padding:8px 11px;border-radius:var(--r-sm)}
+.hor-status.open{background:var(--sage4);color:var(--sage)}
+.hor-status.closed{background:var(--crimson4);color:var(--crimson2)}
+.hor-status.unset{background:var(--slate4);color:var(--slate2)}
+.hor-edit-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--slate4)}
+.hor-edit-row:last-child{border-bottom:none}
+.hor-edit-day{width:38px;font-size:11px;font-weight:700;color:var(--slate);flex-shrink:0}
+.hor-edit-row input[type=checkbox]{width:18px;height:18px;flex-shrink:0;accent-color:var(--sage2)}
+.hor-edit-row select{padding:6px 8px;border:1px solid var(--slate3);border-radius:var(--r-sm);font-size:12px;font-family:'Inter',sans-serif;width:80px;background:var(--white);color:var(--ink)}
+.hor-edit-row select:disabled{opacity:.4;background:var(--slate4)}
+.hor-edit-sep{color:var(--slate2);font-size:11px}
 .info-lbl{font-size:9px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:2px}
 .info-val{font-size:12px;font-weight:500;color:var(--ink)}
 
@@ -515,6 +530,11 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="info-item"><div class="info-lbl">Prochaine visite</div><div class="info-val" id="di-nv"></div></div>
         <div class="info-item"><div class="info-lbl">Nb visites</div><div class="info-val" id="di-nbv"></div></div>
       </div>
+      <div class="info-item" style="margin-top:6px">
+        <div class="info-lbl">Horaires d'ouverture</div>
+        <div id="di-hor-status" class="hor-status unset" style="margin-top:6px">Non renseigné</div>
+        <div id="di-hor-week" class="hor-week"></div>
+      </div>
       <div id="di-tasks-wrap" style="display:none;margin-top:6px">
         <div class="info-item" style="border-left:3px solid var(--amber2)"><div class="info-lbl" style="color:var(--amber)">Tâches</div><div class="info-val" id="di-tasks"></div></div>
       </div>
@@ -527,7 +547,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
       <div class="ca-compare">
         <div class="ca-col"><div class="ca-year">2024</div><div class="ca-amount" id="di-ca24" style="color:var(--slate2)"></div></div>
         <div class="ca-col"><div class="ca-year">2025</div><div class="ca-amount" id="di-ca25" style="color:var(--navy2)"></div></div>
-        <div class="ca-col hl"><div class="ca-year" style="color:var(--navy2)">2026</div><div class="ca-amount" id="di-ca26" style="color:var(--sage)"></div><div id="di-evol" style="font-size:10px;margin-top:2px"></div></div>
+        <div class="ca-col hl"><div class="ca-year" style="color:var(--navy2)">2026</div><div class="ca-amount" id="di-ca26" style="color:var(--sage)"></div><div id="di-evol" style="font-size:10px;margin-top:2px"></div><div style="font-size:9px;color:var(--slate2);margin-top:2px">au 29/06</div></div>
       </div>
       <div class="fg rw-only">
         <label>Ajouter commande (CHF → CA 2026)</label>
@@ -589,6 +609,8 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
         <div class="fg"><label>Tél. 1</label><input id="ed-t1" type="tel"></div>
         <div class="fg"><label>Tél. 2</label><input id="ed-t2" type="tel"></div>
       </div>
+      <div class="sec-title" style="margin-top:4px"><i class="ti ti-clock"></i> Horaires d'ouverture</div>
+      <div id="ed-horaires"></div>
       <div class="sec-title" style="margin-top:4px"><i class="ti ti-settings"></i> Statut</div>
       <div class="fg"><label>Statut</label>
         <select id="ed-st"><option>Actif</option><option>VIP</option><option>Inactif</option><option>Prospect</option><option>Perdu</option></select></div>
@@ -888,7 +910,7 @@ function startPolling() {
                 lastUpdated = fbUpdated;
                 clients = fresh.map(c=>({...c,
                   comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),
-                  ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+                  ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0,horaires:typeof c.horaires==='string'?JSON.parse(c.horaires||'{}'):(c.horaires||{})}));
                 localStorage.setItem('crm_clients', JSON.stringify(clients));
                 rDash(); rC(); rCA();
                 setSyncUI('ok','🔄 '+new Date().toLocaleTimeString('fr-CH',{hour:'2-digit',minute:'2-digit'}));
@@ -963,6 +985,89 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function td(){return new Date().toISOString().slice(0,10)}
 function fmt(d){if(!d)return'—';try{const[y,m,dd]=d.split('-');return`${dd}.${m}.${y}`}catch(e){return d}}
 function fCHF(n){const v=Number(n||0);if(isNaN(v))return'0';return v===0?'0':v.toLocaleString('fr-CH')}
+
+// ═══════════════════════════════════════
+// HORAIRES D'OUVERTURE
+// ═══════════════════════════════════════
+const DAYS_FR=[{k:'lun',l:'Lun'},{k:'mar',l:'Mar'},{k:'mer',l:'Mer'},{k:'jeu',l:'Jeu'},{k:'ven',l:'Ven'},{k:'sam',l:'Sam'},{k:'dim',l:'Dim'}];
+const TIME_SLOTS=['08:00','08:30','09:00','10:00','12:00','13:00','17:00','18:00'];
+function timeOptions(selected){
+  let opts=TIME_SLOTS.slice();
+  if(selected&&!opts.includes(selected)) opts.push(selected);
+  opts.sort();
+  return opts.map(t=>`<option value="${t}" ${t===selected?'selected':''}>${t.replace(':','h').replace(/h00$/,'h')}</option>`).join('');
+}
+function todayKey(){const map=['dim','lun','mar','mer','jeu','ven','sam'];return map[new Date().getDay()];}
+function defaultHoraires(){const h={};DAYS_FR.forEach(d=>h[d.k]={o:false,deb:'09:00',fin:'18:00'});return h;}
+function normHoraires(h){
+  const src=h&&typeof h==='object'?h:{};
+  const out={};
+  DAYS_FR.forEach(d=>{
+    const e=src[d.k]||{};
+    out[d.k]={o:!!e.o,deb:e.deb||'09:00',fin:e.fin||'18:00'};
+  });
+  return out;
+}
+function hasHoraires(h){return h&&typeof h==='object'&&Object.keys(h).length>0;}
+
+function renderHorairesInfo(c){
+  const raw=c.horaires;
+  const statusEl=document.getElementById('di-hor-status');
+  const weekEl=document.getElementById('di-hor-week');
+  if(!hasHoraires(raw)){
+    statusEl.className='hor-status unset';
+    statusEl.textContent='Non renseigné';
+    weekEl.innerHTML='';
+    return;
+  }
+  const h=normHoraires(raw);
+  const tk=todayKey();
+  const today=h[tk];
+  if(today.o){
+    statusEl.className='hor-status open';
+    statusEl.innerHTML=`<i class="ti ti-circle-check"></i> Ouvert aujourd'hui · ${today.deb}–${today.fin}`;
+  } else {
+    statusEl.className='hor-status closed';
+    statusEl.innerHTML=`<i class="ti ti-circle-x"></i> Fermé aujourd'hui`;
+  }
+  weekEl.innerHTML=DAYS_FR.map(d=>{
+    const e=h[d.k];
+    return `<div class="hor-badge ${e.o?'open':''} ${d.k===tk?'today':''}">${d.l}</div>`;
+  }).join('');
+}
+
+function renderHorairesEdit(c){
+  const h=normHoraires(c.horaires);
+  const tk=todayKey();
+  document.getElementById('ed-horaires').innerHTML=DAYS_FR.map(d=>{
+    const e=h[d.k];
+    return `<div class="hor-edit-row">
+      <div class="hor-edit-day">${d.l}${d.k===tk?' •':''}</div>
+      <input type="checkbox" id="ed-h-${d.k}-o" ${e.o?'checked':''} onchange="toggleHorRow('${d.k}')">
+      <select id="ed-h-${d.k}-deb" ${e.o?'':'disabled'}>${timeOptions(e.deb)}</select>
+      <span class="hor-edit-sep">–</span>
+      <select id="ed-h-${d.k}-fin" ${e.o?'':'disabled'}>${timeOptions(e.fin)}</select>
+    </div>`;
+  }).join('');
+}
+
+function toggleHorRow(k){
+  const o=document.getElementById(`ed-h-${k}-o`).checked;
+  document.getElementById(`ed-h-${k}-deb`).disabled=!o;
+  document.getElementById(`ed-h-${k}-fin`).disabled=!o;
+}
+
+function readHorairesFromEdit(){
+  const h={};
+  DAYS_FR.forEach(d=>{
+    h[d.k]={
+      o:document.getElementById(`ed-h-${d.k}-o`).checked,
+      deb:document.getElementById(`ed-h-${d.k}-deb`).value||'09:00',
+      fin:document.getElementById(`ed-h-${d.k}-fin`).value||'18:00'
+    };
+  });
+  return h;
+}
 function ini(s){return(s||'?').split(/\s+/).filter(Boolean).map(w=>w[0]||'').slice(0,2).join('').toUpperCase()}
 function avBg(st){return{VIP:'var(--amber3)',Inactif:'var(--slate3)',Perdu:'var(--slate3)',Prospect:'var(--navy4)'}[st]||'var(--navy4)'}
 function avFg(st){return{VIP:'var(--amber)',Inactif:'var(--slate2)',Perdu:'var(--slate2)',Prospect:'var(--navy2)'}[st]||'var(--navy2)'}
@@ -1037,12 +1142,12 @@ async function boot(){
         salon:r[4]||r[2]||'',rue:r[5]||'',npa:r[6]||'',ville:r[7]||'',
         tel1:r[8]||'',tel2:r[9]||'',
         ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,
-        statut:r[13]||'Actif',comments:'[]',lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''
+        statut:r[13]||'Actif',comments:'[]',lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:'',horaires:{}
       }));
       await fsSet('meta','all_clients',{data:JSON.stringify(allClients),count:allClients.length,updated:new Date().toISOString()});
       fsClients=allClients;
     }
-    clients=fsClients.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+    clients=fsClients.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0,horaires:typeof c.horaires==='string'?JSON.parse(c.horaires||'{}'):(c.horaires||{})}));
     // Debug: check CA totals
     const ca26total = clients.reduce((s,c)=>s+Number(c.ca26||0),0);
     console.log('Loaded clients CA26 total:', ca26total, 'from', clients.length, 'clients');
@@ -1083,13 +1188,13 @@ async function boot(){
       if(lsRaw) {
         clients=JSON.parse(lsRaw).map(c=>({...c,
           comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),
-          ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+          ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0,horaires:typeof c.horaires==='string'?JSON.parse(c.horaires||'{}'):(c.horaires||{})}));
       } else {
-        clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''}));
+        clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:'',horaires:{}}));
       }
     } catch(lsErr) { 
       localStorage.removeItem('crm_clients');
-      clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''}));
+      clients=RAW_CLIENTS.map(r=>({id:'c_'+(r[0]||uid()),kdnr:r[0],sek:r[1],nom:r[2],prenom:r[3],salon:r[4]||r[2],rue:r[5],npa:r[6],ville:r[7],tel1:r[8],tel2:r[9],ca26:Number(r[10])||0,ca25:Number(r[11])||0,ca24:Number(r[12])||0,statut:r[13]||'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:'',horaires:{}}));
     }
     const lsV=localStorage.getItem('crm_visites');
     if(lsV) visites=JSON.parse(lsV);
@@ -1174,7 +1279,7 @@ async function syncNow(){
       const metaData=fromFS(metaDoc);
       if(metaData&&metaData.data){
         const fresh=JSON.parse(metaData.data);
-        clients=fresh.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0}));
+        clients=fresh.map(c=>({...c,comments:typeof c.comments==='string'?JSON.parse(c.comments||'[]'):(c.comments||[]),ca26:Number(c.ca26)||0,ca25:Number(c.ca25)||0,ca24:Number(c.ca24)||0,horaires:typeof c.horaires==='string'?JSON.parse(c.horaires||'{}'):(c.horaires||{})}));
         localStorage.setItem('crm_clients',JSON.stringify(clients));
       }
     }
@@ -1206,7 +1311,8 @@ async function saveClient(c){
         ca26:Number(cl.ca26)||0, ca25:Number(cl.ca25)||0, ca24:Number(cl.ca24)||0,
         statut:cl.statut, comments:JSON.stringify(cl.comments||[]),
         lastVisit:cl.lastVisit||'', nextVisit:cl.nextVisit||'',
-        nbVisites:cl.nbVisites||0, opport:cl.opport||'', tasks:cl.tasks||''
+        nbVisites:cl.nbVisites||0, opport:cl.opport||'', tasks:cl.tasks||'',
+        horaires:JSON.stringify(cl.horaires||{})
       }));
       const ts = new Date().toISOString();
       const res = await fetch(`${FB_URL}/meta/all_clients`,{
@@ -1302,7 +1408,7 @@ function rDash(){
 
   document.getElementById('dKpis').innerHTML=`
     <div class="kpi-card"><div class="kpi-ico" style="background:var(--sage4)"><i class="ti ti-currency-franc" style="color:var(--sage)"></i></div>
-      <div><div class="kpi-val" style="color:var(--sage)">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 (CHF)</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025</div></div></div>
+      <div><div class="kpi-val" style="color:var(--sage)">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 (CHF)</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025 · au 29/06</div></div></div>
     <div class="kpi-card"><div class="kpi-ico" style="background:var(--navy5)"><i class="ti ti-users" style="color:var(--navy2)"></i></div>
       <div><div class="kpi-val" style="color:var(--navy2)">${actifs}</div><div class="kpi-lbl">Clients actifs</div><div class="kpi-sub">${vip} VIP · ${clients.length} total</div></div></div>
     <div class="kpi-card"><div class="kpi-ico" style="background:var(--violet3)"><i class="ti ti-calendar" style="color:var(--violet2)"></i></div>
@@ -1450,6 +1556,8 @@ function openClient(id){
   document.getElementById('di-evol').innerHTML=`<span style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)} CHF</span>`;
   document.getElementById('di-cmd').value='';
   refreshComments(c);
+  renderHorairesInfo(c);
+  renderHorairesEdit(c);
   document.getElementById('ed-kd').value=c.kdnr||'';
   document.getElementById('ed-sek').value=c.sek||'102';
   document.getElementById('ed-nom').value=c.nom||'';
@@ -1476,7 +1584,7 @@ function openClient(id){
 
 function openCM(id){
   if(id){openClient(id);return;}
-  const c={id:uid(),kdnr:'',sek:'102',nom:'',prenom:'',salon:'',rue:'',npa:'',ville:'',tel1:'',tel2:'',ca26:0,ca25:0,ca24:0,statut:'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:''};
+  const c={id:uid(),kdnr:'',sek:'102',nom:'',prenom:'',salon:'',rue:'',npa:'',ville:'',tel1:'',tel2:'',ca26:0,ca25:0,ca24:0,statut:'Actif',comments:[],lastVisit:'',nextVisit:'',nbVisites:0,opport:'',tasks:'',horaires:{}};
   clients.push(c); openClient(c.id);
   gSub('edit',document.querySelectorAll('.stab')[4]);
 }
@@ -1520,7 +1628,7 @@ async function saveEdit(){
   if(isReadOnly) return;
   const id=document.getElementById('cmId').value;
   const c=clients.find(x=>x.id===id); if(!c)return;
-  Object.assign(c,{kdnr:document.getElementById('ed-kd').value,sek:document.getElementById('ed-sek').value,nom:document.getElementById('ed-nom').value,prenom:document.getElementById('ed-pr').value,salon:document.getElementById('ed-sal').value,rue:document.getElementById('ed-rue').value,npa:document.getElementById('ed-npa').value,ville:document.getElementById('ed-vil').value,tel1:document.getElementById('ed-t1').value,tel2:document.getElementById('ed-t2').value,statut:document.getElementById('ed-st').value,opport:document.getElementById('ed-opp').value,tasks:document.getElementById('ed-tasks').value});
+  Object.assign(c,{kdnr:document.getElementById('ed-kd').value,sek:document.getElementById('ed-sek').value,nom:document.getElementById('ed-nom').value,prenom:document.getElementById('ed-pr').value,salon:document.getElementById('ed-sal').value,rue:document.getElementById('ed-rue').value,npa:document.getElementById('ed-npa').value,ville:document.getElementById('ed-vil').value,tel1:document.getElementById('ed-t1').value,tel2:document.getElementById('ed-t2').value,statut:document.getElementById('ed-st').value,opport:document.getElementById('ed-opp').value,tasks:document.getElementById('ed-tasks').value,horaires:readHorairesFromEdit()});
   await saveClient(c); openClient(id); rC(); rDash();
 }
 
@@ -1741,7 +1849,7 @@ function rCA(){
   const a26=clients.filter(c=>(Number(c.ca26)||0)>0).length;
   document.getElementById('caKpis').innerHTML=`
     <div class="kpi-card"><div class="kpi-ico" style="background:var(--sage4)"><i class="ti ti-currency-franc" style="color:var(--sage)"></i></div>
-      <div><div class="kpi-val" style="color:var(--sage);font-size:16px">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 total</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025</div></div></div>
+      <div><div class="kpi-val" style="color:var(--sage);font-size:16px">${fCHF(ca26t)}</div><div class="kpi-lbl">CA 2026 total</div><div class="kpi-sub">${evol>=0?'+':''}${evol.toFixed(1)}% vs 2025 · au 29/06</div></div></div>
     <div class="kpi-card"><div class="kpi-ico" style="background:var(--navy5)"><i class="ti ti-users" style="color:var(--navy2)"></i></div>
       <div><div class="kpi-val" style="color:var(--navy2)">${a26}</div><div class="kpi-lbl">Clients 2026</div><div class="kpi-sub">sur ${clients.length} total</div></div></div>`;
   let list=clients.filter(c=>{
