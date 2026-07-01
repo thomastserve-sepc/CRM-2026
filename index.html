@@ -327,9 +327,9 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 <!-- CLIENTS -->
 <div class="pg" id="pg-clients">
   <div class="search-row">
-    <div class="search-wrap">
+    <div class="search-wrap" style="flex:2">
       <i class="ti ti-search"></i>
-      <input class="search-input" id="sC" type="search" placeholder="Salon, nom, ville, Kd-Nr..." oninput="rC()" autocomplete="off">
+      <input class="search-input" id="sC" type="search" placeholder="🔍 Recherche globale : salon, nom, ville, notes, tâches, opportunités, téléphone..." oninput="rC()" autocomplete="off">
     </div>
     <select class="filter-sel" id="fSt" onchange="rC()">
       <option value="">Tous statuts</option>
@@ -1334,8 +1334,16 @@ function fC(){
   const st=document.getElementById('fSt').value;
   const sek=document.getElementById('fSek').value;
   return clients.filter(c=>{
-    const mQ=!q||[c.salon,c.nom,c.prenom,c.ville,c.kdnr].some(v=>(v||'').toLowerCase().includes(q));
-    return mQ&&(!st||c.statut===st)&&(!sek||c.sek===sek);
+    if(!q) return (!st||c.statut===st)&&(!sek||c.sek===sek);
+    // Search in ALL fields
+    const comments = (c.comments||[]).map(cm=>cm.text||'').join(' ');
+    const allText = [
+      c.salon, c.nom, c.prenom, c.ville, c.kdnr, c.rue,
+      c.tel1, c.tel2, c.statut, c.opport, c.tasks,
+      comments,
+      String(c.ca26||''), String(c.ca25||'')
+    ].join(' ').toLowerCase();
+    return allText.includes(q)&&(!st||c.statut===st)&&(!sek||c.sek===sek);
   });
 }
 function cPg(d){const fc=fC();const t=Math.ceil(fc.length/PER)||1;cpg=Math.max(1,Math.min(t,cpg+d));rC();}
@@ -1351,7 +1359,7 @@ function rC(){
     const rowCl=c.nextVisit?'hl-g':c.statut==='VIP'?'hl-a':((Number(c.ca26)===0&&Number(c.ca25)>0)?'hl-r':'');
     return`<tr class="${rowCl}" onclick="openClient('${c.id}')">
       <td><div class="c-av" style="background:${avBg(c.statut)};color:${avFg(c.statut)}">${ini(c.salon||c.nom)}</div></td>
-      <td><div class="c-salon">${c.salon||c.nom}</div>${c.nextVisit?`<div style="font-size:9px;color:var(--sage)">📅 ${fmt(c.nextVisit)}</div>`:''}</td>
+      <td><div class="c-salon">${highlight(c.salon||c.nom, document.getElementById('sC').value)}</div>${c.nextVisit?`<div style="font-size:9px;color:var(--sage)">📅 ${fmt(c.nextVisit)}</div>`:''}${(c.comments||[]).length&&document.getElementById('sC').value&&(c.comments||[]).some(cm=>(cm.text||'').toLowerCase().includes(document.getElementById('sC').value.toLowerCase()))?`<div style="font-size:9px;color:var(--violet2)">💬 Note contient "${document.getElementById('sC').value}"</div>`:''}</td>
       <td class="c-ville">${c.ville||'—'}</td>
       <td style="color:var(--slate2);font-size:11px">${c.tel1||'—'}</td>
       <td class="c-ca" style="color:${Number(c.ca26)>0?'var(--sage)':'var(--slate2)'}">${fCHF(c.ca26)}</td>
@@ -1944,6 +1952,14 @@ async function loadTasks(){
     const ls = localStorage.getItem('crm_tasks');
     if(ls) try{ tasks=JSON.parse(ls); }catch(e2){}
   }
+}
+
+// Highlight search term
+function highlight(text, q) {
+  if(!q||!text) return text||'';
+  const idx = text.toLowerCase().indexOf(q.toLowerCase());
+  if(idx < 0) return text;
+  return text.substring(0,idx)+'<mark style="background:#fef08a;border-radius:2px">'+text.substring(idx,idx+q.length)+'</mark>'+text.substring(idx+q.length);
 }
 
 // Admin function to reset patron password expiry
