@@ -284,9 +284,13 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   <div class="logo"><i class="ti ti-scissors"></i></div>
   <div class="brand">
     <div class="brand-name">CRM 2026 <span id="roTag" class="ro-badge" style="display:none">LECTURE SEULE</span></div>
-    <div class="brand-sub">Secteurs 102 & 112 · 475 clients</div>
+    <div class="brand-sub">Secteurs 102 & 112 · <span id="brandClientCount">366</span> clients</div>
   </div>
   <div style="display:flex;gap:6px;align-items:center">
+    <div class="sync-pill rw-only" onclick="forceReimportClients()" style="background:rgba(108,77,224,.2);cursor:pointer">
+      <i class="ti ti-database-import" style="font-size:12px;color:#a78bfa"></i>
+      <span style="font-size:10px;color:#a78bfa">Màj clients</span>
+    </div>
     <div class="sync-pill" onclick="repairCA()" style="background:rgba(255,200,0,.2);cursor:pointer">
       <i class="ti ti-tool" style="font-size:12px;color:#ffd700"></i>
       <span style="font-size:10px;color:#ffd700">Réparer CA</span>
@@ -1136,7 +1140,7 @@ async function boot(){
       setSyncUI('error','Hors ligne — données locales');
     }
     if(fsClients.length===0){
-      showLoading('Premier import : 475 clients...');
+      showLoading('Premier import : '+RAW_CLIENTS.length+' clients...');
       const allClients=RAW_CLIENTS.map((r,i)=>({
         id:'c_'+(r[0]||i),kdnr:r[0]||'',sek:r[1]||'',nom:r[2]||'',prenom:r[3]||'',
         salon:r[4]||r[2]||'',rue:r[5]||'',npa:r[6]||'',ville:r[7]||'',
@@ -1202,6 +1206,70 @@ async function boot(){
   }
 }
 
+
+async function forceReimportClients(){
+  const oldCount=clients.length;
+  const newCount=RAW_CLIENTS.length;
+  if(!confirm(`⚠️ Mettre à jour la base clients ?\n\nBase actuelle : ${oldCount} clients\nNouveau fichier : ${newCount} clients\n\nLes clients qui existent dans les deux (même Kd-Nr) garderont leurs notes, tâches, historique de visites et horaires.\nLes clients absents du nouveau fichier seront retirés.\n\nContinuer ?`)) return;
+  setSyncUI('syncing','Mise à jour base clients...');
+  try{
+    const oldByKdnr={};
+    clients.forEach(c=>{ if(c.kdnr) oldByKdnr[String(c.kdnr)]=c; });
+    let kept=0, added=0;
+    const newClients=RAW_CLIENTS.map(r=>{
+      const kdnr=r[0]||'';
+      const old=oldByKdnr[String(kdnr)];
+      if(old) kept++; else added++;
+      return {
+        id:'c_'+(kdnr||uid()), kdnr, sek:r[1]||'', nom:r[2]||'', prenom:r[3]||'',
+        salon:r[4]||r[2]||'', rue:r[5]||'', npa:r[6]||'', ville:r[7]||'',
+        tel1:r[8]||'', tel2:r[9]||'',
+        ca26:Number(r[10])||0, ca25:Number(r[11])||0, ca24:Number(r[12])||0,
+        statut:r[13]||'Actif',
+        comments:old?(old.comments||[]):[],
+        lastVisit:old?(old.lastVisit||''):'',
+        nextVisit:old?(old.nextVisit||''):'',
+        nbVisites:old?(old.nbVisites||0):0,
+        opport:old?(old.opport||''):'',
+        tasks:old?(old.tasks||''):'',
+        horaires:old?(old.horaires||{}):{}
+      };
+    });
+    const removed=oldCount-kept;
+    clients=newClients;
+    localStorage.setItem('crm_clients',JSON.stringify(clients));
+    const ts=new Date().toISOString();
+    const allData=clients.map(cl=>({
+      id:cl.id,kdnr:cl.kdnr,sek:cl.sek,nom:cl.nom,prenom:cl.prenom,
+      salon:cl.salon,rue:cl.rue,npa:cl.npa,ville:cl.ville,
+      tel1:cl.tel1,tel2:cl.tel2,
+      ca26:Number(cl.ca26)||0,ca25:Number(cl.ca25)||0,ca24:Number(cl.ca24)||0,
+      statut:cl.statut,comments:JSON.stringify(cl.comments||[]),
+      lastVisit:cl.lastVisit||'',nextVisit:cl.nextVisit||'',
+      nbVisites:cl.nbVisites||0,opport:cl.opport||'',tasks:cl.tasks||'',
+      horaires:JSON.stringify(cl.horaires||{})
+    }));
+    const res=await fetch(`${FB_URL}/meta/all_clients`,{
+      method:'PATCH',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({fields:{
+        data:{stringValue:JSON.stringify(allData)},
+        count:{stringValue:String(allData.length)},
+        updated:{stringValue:ts}
+      }})
+    });
+    if(res.ok){
+      lastUpdated=ts;
+      rDash();rC();rCA();rV();updateVisBadge();
+      setSyncUI('ok','Base clients mise à jour ✓');
+      alert(`✅ Base clients mise à jour !\n\n${newCount} clients au total\n${kept} conservés avec leur historique\n${added} nouveaux\n${removed} retirés (absents du nouveau fichier)`);
+    } else {
+      const errText=await res.text();
+      console.error('Reimport error:',res.status,errText);
+      setSyncUI('error','Erreur mise à jour');
+      alert('❌ Erreur lors de la mise à jour Firebase. Réessaie ou vérifie ta connexion.');
+    }
+  }catch(e){setSyncUI('error','Erreur: '+e.message);alert('❌ Erreur : '+e.message);}
+}
 
 async function repairCA(){
   setSyncUI('syncing','Réparation CA 2026...');
@@ -1396,6 +1464,7 @@ function updateVisBadge(){const n=visites.filter(v=>vStat(v)==='En retard').leng
 // DASHBOARD
 // ═══════════════════════════════════════
 function rDash(){
+  const bcc=document.getElementById('brandClientCount'); if(bcc) bcc.textContent=clients.length;
   const ca26t=clients.reduce((s,c)=>s+(Number(c.ca26)||0),0);
   const ca25t=clients.reduce((s,c)=>s+(Number(c.ca25)||0),0);
   const evol=ca25t?((ca26t-ca25t)/ca25t*100):0;
