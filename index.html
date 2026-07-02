@@ -1154,7 +1154,14 @@ function sendWA(client, templateKey, extra) {
   if(!tel) { alert('⚠️ Pas de numéro WhatsApp pour ' + (client.salon||client.nom)); return; }
   const msg = tpl.wa(client, extra?.date||'', extra?.heure||'');
   const url = 'https://wa.me/' + tel.replace('+','') + '?text=' + encodeURIComponent(msg);
-  window.open(url, '_blank');
+  // Sur Safari/iPad, window.open est bloqué depuis les modals — on utilise location.href
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
   // Logger l'envoi
   logMessage(client.id, 'whatsapp', templateKey, msg);
 }
@@ -1169,7 +1176,7 @@ function sendEmail(client, templateKey, extra) {
   }
   const subj = encodeURIComponent(tpl.email_subj(client));
   const body = encodeURIComponent(tpl.email_body(client, extra?.date||'', extra?.heure||''));
-  window.location.href = 'mailto:' + client.email + '?subject=' + subj + '&body=' + body;
+  const a3=document.createElement('a');a3.href='mailto:'+client.email+'?subject='+subj+'&body='+body;document.body.appendChild(a3);a3.click();document.body.removeChild(a3);
   logMessage(client.id, 'email', templateKey, tpl.email_body(client));
 }
 
@@ -1180,7 +1187,7 @@ function sendSMS(client, templateKey, extra) {
   const tel = cleanPhone(client.tel1) || cleanPhone(client.tel2);
   if(!tel) { alert('⚠️ Pas de numéro pour ' + (client.salon||client.nom)); return; }
   const msg = tpl.sms(client, extra?.date||'', extra?.heure||'');
-  window.location.href = 'sms:' + tel + '?body=' + encodeURIComponent(msg);
+  const a2=document.createElement('a');a2.href='sms:'+tel+'&body='+encodeURIComponent(msg);document.body.appendChild(a2);a2.click();document.body.removeChild(a2);
   logMessage(client.id, 'sms', templateKey, msg);
 }
 
@@ -1375,7 +1382,7 @@ function launchGroupSend(){
     const c=filtered[i++];
     const tel=(cleanPhone(c.tel1)||cleanPhone(c.tel2)).replace('+','');
     const msg=tpl.wa(c);
-    window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
+    const a_=document.createElement('a');a_.href='https://wa.me/'+tel+'?text='+encodeURIComponent(msg);a_.target='_blank';a_.rel='noopener';document.body.appendChild(a_);a_.click();document.body.removeChild(a_);
     logMessage(c.id,'whatsapp',tplKey,msg);
     if(i<filtered.length) setTimeout(openNext, 1500); // 1.5 sec entre chaque
   }
