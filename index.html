@@ -1164,7 +1164,7 @@ function sendEmail(client, templateKey, extra) {
   const tpl = MSG_TEMPLATES[templateKey];
   if(!tpl) return;
   if(!client.email) { 
-    alert('⚠️ Pas d'email pour ' + (client.salon||client.nom) + '\nUtilisez WhatsApp ou SMS.');
+    alert('⚠️ Pas d\'email pour ' + (client.salon||client.nom) + '\nUtilisez WhatsApp ou SMS.');
     return; 
   }
   const subj = encodeURIComponent(tpl.email_subj(client));
