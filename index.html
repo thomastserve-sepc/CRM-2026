@@ -1433,8 +1433,8 @@ async function forceReimportClients(){
     const ca26total = clients.reduce((s,c)=>s+c.ca26,0);
     hideLoading();
     alert('✅ ' + clients.length + ' clients importés avec succès !\nCA 2026 total : ' + ca26total.toLocaleString('fr-CH') + ' CHF\n\nVos visites et historique ont été conservés.');
-    renderClients();
-    renderDash();
+    rC();
+    rDash();
   } catch(err) {
     hideLoading();
     alert('Erreur : ' + err.message);
@@ -1862,9 +1862,65 @@ async function addCommande(){
 async function saveEdit(){
   if(isReadOnly) return;
   const id=document.getElementById('cmId').value;
-  const c=clients.find(x=>x.id===id); if(!c)return;
-  Object.assign(c,{kdnr:document.getElementById('ed-kd').value,sek:document.getElementById('ed-sek').value,nom:document.getElementById('ed-nom').value,prenom:document.getElementById('ed-pr').value,salon:document.getElementById('ed-sal').value,rue:document.getElementById('ed-rue').value,npa:document.getElementById('ed-npa').value,ville:document.getElementById('ed-vil').value,tel1:document.getElementById('ed-t1').value,tel2:document.getElementById('ed-t2').value,statut:document.getElementById('ed-st').value,opport:document.getElementById('ed-opp').value,tasks:document.getElementById('ed-tasks').value});
+  let c=clients.find(x=>x.id===id);
+
+  if(!c){
+    // ── NOUVEAU CLIENT ──────────────────────────────────────────────────────
+    const nom=document.getElementById('ed-nom').value.trim();
+    const salon=document.getElementById('ed-sal').value.trim();
+    if(!nom&&!salon){alert('Indiquez au moins un nom ou un salon');return;}
+    // Générer un numéro client temporaire si vide
+    let kdnr=document.getElementById('ed-kd').value.trim();
+    if(!kdnr){
+      do{kdnr='P'+Math.floor(10000+Math.random()*89999);}
+      while(clients.find(x=>x.kdnr===kdnr));
+    } else if(clients.find(x=>x.kdnr===kdnr)){
+      alert('Ce numéro client existe déjà !');return;
+    }
+    c={
+      id:'c_'+uid(),
+      kdnr,
+      sek:document.getElementById('ed-sek').value||'102',
+      nom, prenom:document.getElementById('ed-pr').value.trim(),
+      salon:salon||nom,
+      rue:document.getElementById('ed-rue').value.trim(),
+      npa:document.getElementById('ed-npa').value.trim(),
+      ville:document.getElementById('ed-vil').value.trim(),
+      tel1:document.getElementById('ed-t1').value.trim(),
+      tel2:document.getElementById('ed-t2').value.trim(),
+      statut:document.getElementById('ed-st').value||'Actif',
+      opport:document.getElementById('ed-opp').value.trim(),
+      tasks:document.getElementById('ed-tasks').value.trim(),
+      ca26:0,ca25:0,ca24:0,
+      comments:[],lastVisit:'',nextVisit:'',nbVisites:0,
+      _manual:true,_prospect:!document.getElementById('ed-kd').value.trim()
+    };
+    clients.push(c);
+    document.getElementById('cmId').value=c.id;
+    await saveClient(c);
+    openClient(c.id); rC(); rDash();
+    showToast('✓ '+( c.salon||c.nom)+' créé avec succès !');
+    return;
+  }
+
+  // ── MODIFIER CLIENT EXISTANT ─────────────────────────────────────────────
+  Object.assign(c,{
+    kdnr:document.getElementById('ed-kd').value,
+    sek:document.getElementById('ed-sek').value,
+    nom:document.getElementById('ed-nom').value,
+    prenom:document.getElementById('ed-pr').value,
+    salon:document.getElementById('ed-sal').value,
+    rue:document.getElementById('ed-rue').value,
+    npa:document.getElementById('ed-npa').value,
+    ville:document.getElementById('ed-vil').value,
+    tel1:document.getElementById('ed-t1').value,
+    tel2:document.getElementById('ed-t2').value,
+    statut:document.getElementById('ed-st').value,
+    opport:document.getElementById('ed-opp').value,
+    tasks:document.getElementById('ed-tasks').value
+  });
   await saveClient(c); openClient(id); rC(); rDash();
+  showToast('✓ Client mis à jour !');
 }
 
 async function planifierVisite(){
