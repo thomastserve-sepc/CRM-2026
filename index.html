@@ -3034,8 +3034,10 @@ const RAW_CLIENTS=[
 // ═══════════════════════════════════════
 window.tourneeReady = false;
 function initTournee(){
+  if(window.tourneeReady){renderTournee();return;}
   window.tourneeReady = true;
-  renderTournee();
+  // S'assurer que le div t-app est prêt
+  setTimeout(()=>{renderTournee();},50);
 }
 
 
@@ -3159,7 +3161,7 @@ function allC(){const b=new Set(CR.map(c=>c.kd_nr));return[...CR,...extra.filter
 function activeC(){return allC().filter(c=>!del[c.kd_nr])}
 function cMap(){const m={};allC().forEach(c=>{m[c.kd_nr]=c});return m}
 function persist(){save(SK,vis);save(DK,del);save(SCK,sch);save(EK,extra);save(HK,hist);save(BK,book)}
-function showToast(msg,type='ok'){if(tTimer)clearTimeout(tTimer);toast={msg,type};renderTournee();tTimer=setTimeout(()=>{toast=null;render()},2600);}
+function showToast(msg,type='ok'){if(tTimer)clearTimeout(tTimer);toast={msg,type};renderTournee();tTimer=setTimeout(()=>{toast=null;renderTournee();},2600);}
 
 function totalCA2026(filter){
   let t=0;
@@ -4269,19 +4271,21 @@ function syncTourneeToCRM(kd_nr){
 }
 
 function renderTourneeStatsPage(){
-  const container=document.getElementById('t-stats-app');
-  if(!container)return;
-  container.innerHTML='';
-  const wkDates=getWkDates();
-  const ac=activeC();
-  const td=today();
-  const tCA=totalCA2026();
-  const wCA=totalCA2026(d=>wkDates.includes(d));
-  const dCA=totalCA2026(d=>d===td);
-  const statsEl=renderStats(wkDates,ac,td,tCA,wCA,dCA);
-  container.appendChild(statsEl);
+  if(!window.tourneeReady){initTournee();}
+  setTimeout(()=>{
+    const container=document.getElementById('t-stats-app');
+    if(!container)return;
+    container.innerHTML='';
+    const wkDates=getWkDates();
+    const ac=activeC();
+    const td=today();
+    const tCA=totalCA2026();
+    const wCA=totalCA2026(d=>wkDates.includes(d));
+    const dCA=totalCA2026(d=>d===td);
+    const statsEl=renderStats(wkDates,ac,td,tCA,wCA,dCA);
+    container.appendChild(statsEl);
+  },100);
 }
-
 </script>
 </body>
 </html>
