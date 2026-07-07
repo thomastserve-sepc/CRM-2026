@@ -751,6 +751,16 @@ input,select,textarea{font-family:inherit;font-size:16px!important;background:#f
     <button class="btn btn-amber" onclick="svCmd()"><i class="ti ti-device-floppy"></i> Enregistrer</button>
   </div>
 </div>
+
+<!-- PLANNING TOURNÉE -->
+<div class="pg" id="pg-planning" style="padding:0;overflow:hidden;height:calc(100vh - 90px)">
+  <div id="t-app" style="height:100%;overflow-y:auto;background:#f1f5f9"></div>
+</div>
+
+<!-- STATS TOURNÉE -->
+<div class="pg" id="pg-t-stats" style="padding:0;overflow-y:auto;height:calc(100vh - 90px);background:#f1f5f9">
+  <div id="t-stats-app" style="padding:8px"></div>
+</div>
 </div>
 
 <script>
@@ -2147,6 +2157,29 @@ function showPrev(cid,prevId,srchId){
     <div><div style="font-size:13px;font-weight:700">${c.salon||c.nom} <span class="pill ${pCl(c.statut)}">${c.statut}</span></div>
     <div style="font-size:11px;color:var(--slate2)">${c.ville} · ${c.tel1||'—'}</div></div></div>
   <div style="font-size:11px;color:var(--slate2);display:flex;align-items:center;gap:4px"><i class="ti ti-chart-bar" style="font-size:12px"></i>CA 2026: <strong style="color:var(--sage)">${fCHF(c.ca26)} CHF</strong> · 2025: ${fCHF(c.ca25)} CHF</div>
+  ${(()=>{
+    // Statut visite Tournée
+    try{
+      const kd=c.kdnr||'';
+      const visT=JSON.parse(localStorage.getItem('tv3_sa')||'{}');
+      const bookT=JSON.parse(localStorage.getItem('bk3_sa')||'{}');
+      const vT=visT[kd];
+      const hasBook=!!bookT[kd];
+      const statusColors={visited:'#22c55e',absent:'#f59e0b',closed:'#ef4444',callback:'#8b5cf6'};
+      const statusLabels={visited:'✓ Visité',absent:'~ Absent',closed:'✕ Fermé',callback:'↩ Rappel'};
+      let html='';
+      if(vT&&vT.status){
+        const col=statusColors[vT.status]||'#94a3b8';
+        const lbl=statusLabels[vT.status]||vT.status;
+        html+=`<div style="font-size:11px;display:flex;align-items:center;gap:6px;margin-top:3px">
+          <span style="color:${col};font-weight:700;background:${col}18;padding:2px 7px;border-radius:20px">${lbl}</span>
+          ${vT.amount&&parseFloat(vT.amount)>0?`<span style="color:#22c55e;font-weight:600">${parseFloat(vT.amount).toLocaleString('fr-CH')} CHF</span>`:''}
+          ${hasBook?'<span style="color:#0891b2">📖 Catalogue remis</span>':''}
+        </div>`;
+      }
+      return html;
+    }catch(e){return '';}
+  })()}
   ${lc?`<div style="font-size:11px;color:var(--navy2);display:flex;align-items:center;gap:4px"><i class="ti ti-message-2" style="font-size:12px"></i>${lc.text.substring(0,80)}</div>`:''}`;
 }
 
@@ -3620,7 +3653,14 @@ function renderModal(m,wkDates,cm,ac,td){
     ['visited','absent','closed','callback'].forEach(k=>{
       const cfg=SC[k],active=(v.status||'none')===k;
       stBtns.appendChild(h('button',{style:{padding:'8px 12px',borderRadius:9,border:'2px solid '+(active?cfg.c:'#e2e8f0'),background:active?cfg.c+'15':'#f8fafc',color:active?cfg.c:'#64748b',cursor:'pointer',fontWeight:600,fontSize:12},
-        onClick:()=>{vis[c.kd_nr]={...v,status:k,visitDate:v.visitDate||today()};persist();archiveCurrentVisit(c.kd_nr);modal={type:'visit',client:c};renderTournee();}},cfg.i+' '+cfg.l));
+        onClick:()=>{
+          vis[c.kd_nr]={...v,status:k,visitDate:v.visitDate||today()};
+          persist();
+          archiveCurrentVisit(c.kd_nr);
+          // Sync automatique vers CRM
+          syncTourneeToCRM(c.kd_nr);
+          modal={type:'visit',client:c};renderTournee();
+        }},cfg.i+' '+cfg.l));
     });
     body.appendChild(h('div',null,h('div',{className:'t-fl'},'Statut'),stBtns));
 
@@ -4171,6 +4211,63 @@ render();
 
 
 
+// Sync automatique Tournée → CRM quand une visite est validée
+function syncTourneeToCRM(kd_nr){
+  try{
+    const v=vis[kd_nr]||{};
+    const c_=cMap()[kd_nr];
+    if(!c_)return;
+    const hasBook_=!!book[kd_nr];
+    const hrs=(()=>{try{return JSON.parse(localStorage.getItem('salon_hours_2026')||'{}')[kd_nr]||null;}catch{return null;}})();
+    
+    // Mettre à jour dans le tableau clients CRM (utilisé par rC() et rDash())
+    const crmIdx=clients.findIndex(cl=>cl.kdnr===kd_nr);
+    if(crmIdx>=0){
+      const cl=clients[crmIdx];
+      // Mettre à jour statut visite
+      if(v.visitDate)cl.lastVisit=v.visitDate;
+      if(v.status==='visited')cl.nbVisites=(cl.nbVisites||0)+1;
+      // Ajouter commentaire avec statut + montant + catalogue
+      if(!cl.comments)cl.comments=[];
+      const note_=[];
+      const lbl={visited:'✓ Visité',absent:'~ Absent',closed:'✕ Fermé',callback:'↩ Rappel'};
+      if(v.status)note_.push(lbl[v.status]||v.status);
+      if(v.amount&&parseFloat(v.amount)>0)note_.push(parseFloat(v.amount).toLocaleString('fr-CH')+' CHF');
+      if(v.products)note_.push(v.products);
+      if(v.note)note_.push(v.note);
+      if(hasBook_)note_.push('📖 Catalogue remis');
+      if(note_.length>0){
+        // Éviter les doublons pour la même date
+        const today_=typeof today!=='undefined'?today():new Date().toISOString().slice(0,10);
+        const existing=cl.comments.find(cm=>cm.date===today_&&cm.auto);
+        if(existing){existing.text='📅 Tournée '+today_+' — '+note_.join(' · ');}
+        else{cl.comments.unshift({text:'📅 Tournée '+today_+' — '+note_.join(' · '),date:today_,auto:true});}
+      }
+      if(hrs)cl.horaires=hrs;
+      // Sauvegarder en Firebase si online
+      if(typeof fsSet!=='undefined'){
+        fsSet('meta','all_clients',{data:JSON.stringify(clients),count:clients.length,updated:new Date().toISOString()})
+          .catch(()=>{});// Silencieux si hors ligne
+      }
+      localStorage.setItem('crm_clients',JSON.stringify(clients));
+      // Rafraîchir le dashboard CRM si visible
+      if(typeof rDash!=='undefined')try{rDash();}catch(e){}
+    } else {
+      // Client pas encore dans le CRM - l'ajouter via crm_pending
+      let pending=JSON.parse(localStorage.getItem('crm_pending')||'{"clients":{},"visites":{},"hist":[],"cmds":[]}');
+      const uid_=()=>Math.random().toString(36).slice(2,10);
+      const newCl={id:'c_'+kd_nr,kdnr:kd_nr,sek:c_.sek,nom:c_.name,prenom:c_.vorname||'',
+        salon:(c_.salon||c_.name),rue:c_.strasse||'',npa:c_.plz||'',ville:c_.ort||'',
+        tel1:c_.tel||'',ca26:parseInt(c_.ca_2026)||0,ca25:parseInt(c_.ca_2025)||0,
+        statut:'Actif',comments:[],lastVisit:v.visitDate||'',nbVisites:v.status==='visited'?1:0};
+      if(hasBook_)newCl.catalogue=true;
+      if(hrs)newCl.horaires=hrs;
+      pending.clients[newCl.id]=newCl;
+      localStorage.setItem('crm_pending',JSON.stringify(pending));
+    }
+  }catch(err){console.warn('syncTourneeToCRM error:',err);}
+}
+
 function renderTourneeStatsPage(){
   const container=document.getElementById('t-stats-app');
   if(!container)return;
@@ -4185,9 +4282,6 @@ function renderTourneeStatsPage(){
   container.appendChild(statsEl);
 }
 
-</script></body></html
-
-<!-- STATS TOURNÉE -->
-<div class="pg" id="pg-t-stats" style="padding:0;overflow-y:auto;height:calc(100vh - 90px);background:#f1f5f9">
-  <div id="t-stats-app" style="padding:8px"></div>
-</div>>
+</script>
+</body>
+</html>
