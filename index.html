@@ -555,6 +555,10 @@ input,select,textarea{font-family:inherit;font-size:16px!important;background:#f
         <div class="info-item"><div class="info-lbl">Dernière visite</div><div class="info-val" id="di-lv"></div></div>
         <div class="info-item"><div class="info-lbl">Prochaine visite</div><div class="info-val" id="di-nv"></div></div>
         <div class="info-item"><div class="info-lbl">Nb visites</div><div class="info-val" id="di-nbv"></div></div>
+        <div class="info-item"><div class="info-lbl">Catalogue</div><div class="info-val" id="di-cat">—</div></div>
+        <div style="margin-top:6px">
+          <button class="btn rw-only" id="di-cat-btn" onclick="toggleCatalogue()" style="width:100%;padding:10px;font-size:13px;font-weight:600;border-radius:8px;border:1px solid #bbf7d0;background:#f0fdf4;color:#16a34a;cursor:pointer">📖 Marquer catalogue remis</button>
+        </div>
       </div>
       <div id="di-tasks-wrap" style="display:none;margin-top:6px">
         <div class="info-item" style="border-left:3px solid var(--amber2)"><div class="info-lbl" style="color:var(--amber)">Tâches</div><div class="info-val" id="di-tasks"></div></div>
@@ -726,6 +730,12 @@ input,select,textarea{font-family:inherit;font-size:16px!important;background:#f
 </div>
 
 <script>
+// Données Tournée pour affichage CRM
+(function(){
+  localStorage.setItem('bk3_sa', JSON.stringify({"13496": {"at": "2026-07-07"}, "14542": {"at": "2026-07-07"}, "15000": {"at": "2026-07-07"}, "18532": {"at": "2026-07-07"}, "21683": {"at": "2026-07-07"}, "22102": {"at": "2026-07-09"}, "23943": {"at": "2026-07-09"}, "24042": {"at": "2026-07-07"}, "24559": {"at": "2026-07-13"}, "26350": {"at": "2026-07-07"}, "30468": {"at": "2026-07-09"}, "30574": {"at": "2026-07-09"}, "30655": {"at": "2026-07-09"}, "30664": {"at": "2026-07-07"}, "31020": {"at": "2026-07-09"}, "31061": {"at": "2026-07-07"}, "31655": {"at": "2026-07-13"}, "31674": {"at": "2026-07-09"}, "31679": {"at": "2026-07-07"}, "31724": {"at": "2026-07-09"}, "P71163": {"at": "2026-07-09"}}));
+  localStorage.setItem('tv3_sa', JSON.stringify({"13496": {"status": "visited", "visitDate": "2026-07-07", "reason": "Présentation produits"}, "14542": {"status": "visited", "visitDate": "2026-07-07", "reason": "Présentation produits"}, "15000": {"status": "visited", "visitDate": "2026-07-07", "reason": "Suivi commande", "amount": "112"}, "18532": {"status": "visited", "visitDate": "2026-07-07", "amount": "50"}, "21683": {"status": "visited", "visitDate": "2026-07-07", "amount": "449", "reason": "Présentation produits"}, "22102": {"status": "visited", "visitDate": "2026-07-09", "reason": "Suivi commande"}, "23943": {"status": "absent", "visitDate": "2026-07-09"}, "24042": {"status": "visited", "visitDate": "2026-07-07", "reason": "Suivi commande"}, "24559": {"status": "visited", "visitDate": "2026-07-13", "reason": "Suivi commande"}, "26350": {"status": "visited", "visitDate": "2026-07-07", "amount": "112", "reason": "Suivi commande", "products": "Brosse boucle, embout swiss"}, "29658": {"status": "visited", "visitDate": "2026-07-09", "amount": "241", "reason": "Suivi commande"}, "30069": {"status": "closed", "visitDate": "2026-07-09", "reason": "Présentation produits", "products": "Vacances"}, "30468": {"products": "Intéressé XOXO mais part en vacances 3 semaines ", "status": "visited", "visitDate": "2026-07-09"}, "30574": {"status": "absent", "visitDate": "2026-07-09", "reason": "Présentation produits"}, "30655": {"status": "visited", "visitDate": "2026-07-08", "reason": "Présentation produits"}, "30664": {"status": "visited", "visitDate": "2026-07-07", "reason": "Présentation produits"}, "31020": {"status": "visited", "visitDate": "2026-07-09", "reason": "Présentation produits"}, "31061": {"status": "visited", "visitDate": "2026-07-07", "reason": "Suivi commande", "products": "Nouveau BRINK ciseau mashiro 229.-", "amount": "229"}, "31147": {"status": "absent", "visitDate": "2026-07-09", "reason": "Suivi commande"}, "31655": {"status": "visited", "visitDate": "2026-07-13", "amount": "88", "reason": "Suivi commande"}, "31674": {"status": "visited", "visitDate": "2026-07-09"}, "31679": {"status": "closed", "visitDate": "2026-07-07", "reason": "Présentation produits"}, "31724": {"status": "visited", "visitDate": "2026-07-09", "reason": "Suivi commande"}, "P71163": {"status": "visited", "visitDate": "2026-07-09", "reason": "Suivi commande", "amount": "337"}, "P65918": {"status": "visited", "visitDate": "2026-07-09", "amount": "657", "products": "2+2 swissliss"}}));
+})();
+
 // ═══════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════
@@ -1701,6 +1711,11 @@ function rDash(){
   document.getElementById('dUrgence').innerHTML=urgence.length?urgence.map(c=>{
     const days=daysSince(c.lastVisit);
     const isVip=c.statut==='VIP';
+        // Lire catalogue depuis localStorage Tournée
+        let tBook={};try{tBook=JSON.parse(localStorage.getItem('bk3_sa')||'{}')}catch{}
+        let tVis2={};try{tVis2=JSON.parse(localStorage.getItem('tv3_sa')||'{}')}catch{}
+        const hasCat=!!tBook[c.kdnr];
+        const tVisit=tVis2[c.kdnr]||null;
     const urgColor=days>120?'var(--crimson2)':days>90?'var(--amber2)':'var(--slate2)';
     const urgBg=days>120?'var(--crimson4)':days>90?'var(--amber4)':'var(--slate4)';
     return`<div class="urgence-item" onclick="openClient('${c.id}')">
@@ -1777,19 +1792,42 @@ function rC(){
   document.getElementById('cCount').textContent=`${fc.length} client${fc.length>1?'s':''}`;
   document.getElementById('cPi').textContent=`${cpg}/${Math.ceil(fc.length/PER)||1}`;
   const page=fc.slice((cpg-1)*PER,cpg*PER);
+  // Charger statuts Tournée depuis localStorage
+  let tVis={},tBook={};
+  try{tVis=JSON.parse(localStorage.getItem('tv3_sa')||'{}');}catch(e){}
+  try{tBook=JSON.parse(localStorage.getItem('bk3_sa')||'{}');}catch(e){}
+  const tStatusColor={visited:'#22c55e',absent:'#f59e0b',closed:'#ef4444',callback:'#8b5cf6'};
+  const tStatusIcon={visited:'✓',absent:'~',closed:'✕',callback:'↩'};
+
   document.getElementById('cTbody').innerHTML=page.map(c=>{
     const diff=(Number(c.ca26)||0)-(Number(c.ca25)||0);
     const days=daysSince(c.lastVisit);
-    const rowCl=c.nextVisit?'hl-g':c.statut==='VIP'?'hl-a':((Number(c.ca26)===0&&Number(c.ca25)>0)?'hl-r':'');
+    const tV=tVis[c.kdnr]||null;
+    const hasBook=!!tBook[c.kdnr];
+    const tCol=tV?tStatusColor[tV.status]||'#94a3b8':'';
+    const tIco=tV?tStatusIcon[tV.status]||'○':'';
+    const tAmt=tV&&parseFloat(tV.amount)>0?parseFloat(tV.amount).toLocaleString('fr-CH')+' CHF':'';
+    const rowCl=tV?.status==='visited'?'hl-g':c.nextVisit?'hl-g':c.statut==='VIP'?'hl-a':((Number(c.ca26)===0&&Number(c.ca25)>0)?'hl-r':'');
     return`<tr class="${rowCl}" onclick="openClient('${c.id}')">
       <td><div class="c-av" style="background:${avBg(c.statut)};color:${avFg(c.statut)}">${ini(c.salon||c.nom)}</div></td>
-      <td><div class="c-salon">${highlight(c.salon||c.nom, document.getElementById('sC').value)}</div>${c.nextVisit?`<div style="font-size:9px;color:var(--sage)">📅 ${fmt(c.nextVisit)}</div>`:''}${(c.comments||[]).length&&document.getElementById('sC').value&&(c.comments||[]).some(cm=>(cm.text||'').toLowerCase().includes(document.getElementById('sC').value.toLowerCase()))?`<div style="font-size:9px;color:var(--violet2)">💬 Note contient "${document.getElementById('sC').value}"</div>`:''}</td>
+      <td>
+        <div class="c-salon">${highlight(c.salon||c.nom, document.getElementById('sC').value)}</div>
+        ${tV?`<div style="font-size:9px;font-weight:600;color:${tCol}">${tIco} ${tV.status==='visited'?'Visité':tV.status==='absent'?'Absent':tV.status==='closed'?'Fermé':'Rappel'}${tAmt?' · '+tAmt:''}</div>`:''}
+        ${hasBook?`<div style="font-size:9px;color:#0891b2">📖 Catalogue remis</div>`:''}
+        ${c.nextVisit?`<div style="font-size:9px;color:var(--sage)">📅 ${fmt(c.nextVisit)}</div>`:''}
+      </td>
       <td class="c-ville">${c.ville||'—'}</td>
       <td style="color:var(--slate2);font-size:11px">${c.tel1||'—'}</td>
       <td class="c-ca" style="color:${Number(c.ca26)>0?'var(--sage)':'var(--slate2)'}">${fCHF(c.ca26)}</td>
       <td class="c-ca" style="color:var(--navy2)">${fCHF(c.ca25)}</td>
       <td class="c-ca" style="color:${diff>=0?'var(--sage)':'var(--crimson2)'}">${diff>=0?'+':''}${fCHF(diff)}</td>
-      <td><span class="pill ${pCl(c.statut)}">${c.statut}</span></td>
+      <td>
+        ${tV?.status==='visited'?`<span class="pill" style="background:#dcfce7;color:#16a34a">✓ Visité</span>`:
+          tV?.status==='absent'?`<span class="pill" style="background:#fef9c3;color:#d97706">~ Absent</span>`:
+          tV?.status==='closed'?`<span class="pill" style="background:#fee2e2;color:#dc2626">✕ Fermé</span>`:
+          tV?.status==='callback'?`<span class="pill" style="background:#f3e8ff;color:#7c3aed">↩ Rappel</span>`:
+          `<span class="pill ${pCl(c.statut)}">${c.statut}</span>`}
+      </td>
       <td style="font-size:10px;color:var(--slate2)">${fmt(c.nextVisit)||'—'}</td>
       <td style="font-size:10px;color:${days>60?'var(--crimson2)':days>30?'var(--amber2)':'var(--slate2)'}">${c.lastVisit?fmt(c.lastVisit)+' ('+days+'j)':'Jamais'}</td>
     </tr>`;
@@ -1799,6 +1837,16 @@ function rC(){
 // ═══════════════════════════════════════
 // CLIENT DETAIL
 // ═══════════════════════════════════════
+function toggleCatalogue(){
+  const c=clients.find(x=>x.id===currentClientId);if(!c)return;
+  let tBook={};try{tBook=JSON.parse(localStorage.getItem('bk3_sa')||'{}')}catch{}
+  if(tBook[c.kdnr])delete tBook[c.kdnr];
+  else tBook[c.kdnr]={at:new Date().toISOString().slice(0,10)};
+  localStorage.setItem('bk3_sa',JSON.stringify(tBook));
+  openClient(currentClientId);
+  showToast(tBook[c.kdnr]?'📖 Catalogue marqué remis':'Catalogue retiré');
+}
+
 function openClient(id){
   currentClientId=id;
   const c=clients.find(x=>x.id===id); if(!c)return;
@@ -1818,6 +1866,14 @@ function openClient(id){
   document.getElementById('di-lv').textContent=c.lastVisit?fmt(c.lastVisit)+' ('+daysSince(c.lastVisit)+' jours)':'Jamais';
   document.getElementById('di-nv').textContent=fmt(c.nextVisit)||'—';
   document.getElementById('di-nbv').textContent=(c.nbVisites||0)+' visite(s)';
+  // Catalogue depuis localStorage Tournée
+  let tBook2={};try{tBook2=JSON.parse(localStorage.getItem('bk3_sa')||'{}')}catch{}
+  const hasCat2=!!tBook2[c.kdnr];
+  document.getElementById('di-cat').innerHTML=hasCat2?'<span style="color:#0891b2;font-weight:600">📖 ✅ Remis</span>':'<span style="color:#94a3b8">Non remis</span>';
+  document.getElementById('di-cat-btn').textContent=hasCat2?'📖 Annuler catalogue':'📖 Marquer catalogue remis';
+  document.getElementById('di-cat-btn').style.background=hasCat2?'#fef2f2':'#f0fdf4';
+  document.getElementById('di-cat-btn').style.borderColor=hasCat2?'#fecaca':'#bbf7d0';
+  document.getElementById('di-cat-btn').style.color=hasCat2?'#dc2626':'#16a34a';
   const tw=document.getElementById('di-tasks-wrap');
   const ow=document.getElementById('di-opp-wrap');
   if(c.tasks){tw.style.display='block';document.getElementById('di-tasks').textContent=c.tasks;}else tw.style.display='none';
